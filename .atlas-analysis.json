@@ -1,0 +1,121 @@
+{
+  "projectType": "sdk-library",
+  "projectName": "React Native Calendars",
+  "projectDescription": "A declarative cross-platform React Native calendar component library for iOS and Android with customizable styling and date marking.",
+  "theme": "palm",
+  "primaryColor": "#00adf5",
+  "lightColor": "#4fc3f7",
+  "darkColor": "#0288d1",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/date-marking",
+              "concepts/theming",
+              "concepts/localization",
+              "concepts/accessibility"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/customization",
+              "guides/working-with-dates",
+              "guides/advanced-marking",
+              "guides/performance"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Components",
+            "pages": [
+              "api/calendar",
+              "api/calendar-list",
+              "api/agenda",
+              "api/expandable-calendar",
+              "api/week-calendar",
+              "api/timeline"
+            ]
+          },
+          {
+            "group": "Context & Providers",
+            "pages": [
+              "api/calendar-provider",
+              "api/calendar-context"
+            ]
+          },
+          {
+            "group": "Utilities",
+            "pages": [
+              "api/calendar-utils",
+              "api/locale-config"
+            ]
+          },
+          {
+            "group": "Types",
+            "pages": [
+              "api/types"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Examples",
+        "groups": [
+          {
+            "group": "Usage Examples",
+            "pages": [
+              "examples/basic-calendar",
+              "examples/marked-dates",
+              "examples/custom-themes",
+              "examples/agenda-view",
+              "examples/expandable-calendar"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Pure JavaScript implementation with no native code required",
+    "Date marking with dot, multi-dot, period, multi-period and custom styles",
+    "Comprehensive theming and customization options",
+    "Multiple calendar types: Calendar, CalendarList, Agenda, ExpandableCalendar, Timeline",
+    "Swipeable calendar with gesture support",
+    "Automatic date formatting for different locales",
+    "Accessibility support",
+    "Week calendar and timeline components",
+    "Calendar context and provider for state management"
+  ],
+  "publicApiSurface": [
+    "Calendar",
+    "CalendarList",
+    "Agenda",
+    "ExpandableCalendar",
+    "WeekCalendar",
+    "AgendaList",
+    "Timeline",
+    "TimelineList",
+    "CalendarProvider",
+    "CalendarContext",
+    "asCalendarConsumer",
+    "CalendarUtils",
+    "LocaleConfig"
+  ]
+}
