@@ -1,0 +1,360 @@
+---
+title: Agenda
+description: Calendar component with an agenda/reservation list for displaying events and appointments
+---
+
+The Agenda component combines a CalendarList with a reservation list, providing an interactive calendar view with expandable/collapsible agenda items.
+
+## Basic usage
+
+```jsx
+import { Agenda } from 'react-native-calendars';
+
+<Agenda
+  items={{
+    '2023-05-22': [{name: 'item 1 - any js object'}],
+    '2023-05-23': [{name: 'item 2 - any js object'}]
+  }}
+  renderItem={(item) => <Text>{item.name}</Text>}
+/>
+```
+
+## Props
+
+Agenda extends both [CalendarList](/api/calendar-list) and ReservationList props.
+
+### Data configuration
+
+<ParamField path="items" type="AgendaSchedule">
+  The list of items to display in the agenda. If you want to render an item as an empty date, the value must be an empty array `[]`. If no value exists for a date key, it's considered not yet loaded.
+  
+  ```typescript
+  {
+    '2023-05-22': [{name: 'item 1', height: 80, day: '2023-05-22'}],
+    '2023-05-23': [],  // Empty day
+    '2023-05-24': [{name: 'item 2', height: 80, day: '2023-05-24'}]
+  }
+  ```
+</ParamField>
+
+<ParamField path="selected" type="string">
+  Initially selected day in YYYY-MM-DD format.
+</ParamField>
+
+### Loading and data management
+
+<ParamField path="loadItemsForMonth" type="(date: DateData) => void">
+  Callback that gets called when items for a certain month should be loaded (month became visible).
+  
+  ```jsx
+  loadItemsForMonth={(month) => {
+    console.log('Loading items for', month);
+    // Load items for this month
+  }}
+  ```
+</ParamField>
+
+<ParamField path="refreshing" type="boolean">
+  Set this to `true` while waiting for new data from a refresh.
+</ParamField>
+
+<ParamField path="onRefresh" type="() => void">
+  If provided, a standard RefreshControl will be added for pull-to-refresh functionality.
+</ParamField>
+
+<ParamField path="refreshControl" type="JSX.Element">
+  A RefreshControl component for custom pull-to-refresh functionality.
+</ParamField>
+
+### Event handlers
+
+<ParamField path="onDayPress" type="(date: DateData) => void">
+  Handler which gets executed on day press.
+</ParamField>
+
+<ParamField path="onDayChange" type="(date: DateData) => void">
+  Callback that gets called when the selected day changes while scrolling the agenda list.
+  
+  ```jsx
+  onDayChange={(day) => {
+    console.log('Day changed to:', day.dateString);
+  }}
+  ```
+</ParamField>
+
+<ParamField path="onCalendarToggled" type="(enabled: boolean) => void">
+  Callback that fires when the calendar is opened or closed.
+  
+  ```jsx
+  onCalendarToggled={(isOpen) => {
+    console.log('Calendar is', isOpen ? 'open' : 'closed');
+  }}
+  ```
+</ParamField>
+
+### Scroll handlers
+
+<ParamField path="onScroll" type="(yOffset: number) => void">
+  Called on scroll event with the current y offset.
+</ParamField>
+
+<ParamField path="onScrollBeginDrag" type="(event: NativeSyntheticEvent<NativeScrollEvent>) => void">
+  Called when the user begins dragging the agenda list.
+</ParamField>
+
+<ParamField path="onScrollEndDrag" type="(event: NativeSyntheticEvent<NativeScrollEvent>) => void">
+  Called when the user stops dragging the agenda list.
+</ParamField>
+
+<ParamField path="onMomentumScrollBegin" type="(event: NativeSyntheticEvent<NativeScrollEvent>) => void">
+  Called when momentum scroll starts.
+</ParamField>
+
+<ParamField path="onMomentumScrollEnd" type="(event: NativeSyntheticEvent<NativeScrollEvent>) => void">
+  Called when momentum scroll stops.
+</ParamField>
+
+### Rendering customization
+
+<ParamField path="renderItem" type="(reservation: AgendaEntry, isFirst: boolean) => JSX.Element">
+  Specify how each agenda item should be rendered.
+  
+  ```jsx
+  renderItem={(item, isFirst) => (
+    <View style={{padding: 10}}>
+      <Text>{item.name}</Text>
+      <Text>{item.height}</Text>
+    </View>
+  )}
+  ```
+</ParamField>
+
+<ParamField path="renderDay" type="(date?: XDate, item?: AgendaEntry) => JSX.Element">
+  Specify how each date should be rendered. Date can be undefined if the item is not the first in that day.
+  
+  ```jsx
+  renderDay={(day) => (
+    <View>
+      <Text>{day.getDay()}</Text>
+      <Text>{day.getMonth()}</Text>
+    </View>
+  )}
+  ```
+</ParamField>
+
+<ParamField path="renderEmptyDate" type="(date?: XDate) => JSX.Element">
+  Specify how empty date content with no items should be rendered.
+  
+  ```jsx
+  renderEmptyDate={() => (
+    <View style={{padding: 20}}>
+      <Text>No events</Text>
+    </View>
+  )}
+  ```
+</ParamField>
+
+<ParamField path="renderEmptyData" type="() => JSX.Element">
+  Specify what should be rendered instead of ActivityIndicator when loading.
+</ParamField>
+
+<ParamField path="renderKnob" type="() => JSX.Element">
+  Specify how the agenda knob should look like.
+  
+  ```jsx
+  renderKnob={() => (
+    <View style={{width: 40, height: 4, backgroundColor: 'gray'}} />
+  )}
+  ```
+</ParamField>
+
+<ParamField path="renderList" type="(listProps: ReservationListProps) => JSX.Element">
+  Override the inner list with a custom implemented component.
+</ParamField>
+
+### Display options
+
+<ParamField path="hideKnob" type="boolean" default="false">
+  Hide the knob button that allows expanding/collapsing the calendar.
+</ParamField>
+
+<ParamField path="showClosingKnob" type="boolean">
+  Whether the knob should always be visible (when hideKnob = false).
+</ParamField>
+
+<ParamField path="showOnlySelectedDayItems" type="boolean" default="false">
+  Show items only for the selected date.
+</ParamField>
+
+### Data comparison
+
+<ParamField path="rowHasChanged" type="(a: AgendaEntry, b: AgendaEntry) => boolean">
+  Specify your item comparison function for increased performance.
+  
+  ```jsx
+  rowHasChanged={(r1, r2) => r1.name !== r2.name}
+  ```
+</ParamField>
+
+<ParamField path="reservationsKeyExtractor" type="(item: DayAgenda, index: number) => string">
+  Extractor for the underlying FlatList. Ensure this is unique per item to avoid scrolling issues.
+</ParamField>
+
+### Styling
+
+<ParamField path="theme" type="Theme">
+  Specify theme properties to override specific styles.
+  
+  ```typescript
+  {
+    agendaDayTextColor: 'yellow',
+    agendaDayNumColor: 'green',
+    agendaTodayColor: 'red',
+    agendaKnobColor: 'blue'
+  }
+  ```
+</ParamField>
+
+<ParamField path="style" type="ViewStyle">
+  Style for the agenda container.
+</ParamField>
+
+<ParamField path="testID" type="string">
+  Test identifier for automated testing.
+</ParamField>
+
+## Examples
+
+### Basic agenda with items
+
+```jsx
+import { Agenda } from 'react-native-calendars';
+import { useState } from 'react';
+
+function MyAgenda() {
+  const [items, setItems] = useState({
+    '2023-05-22': [{name: 'Meeting', height: 50}],
+    '2023-05-23': [{name: 'Lunch', height: 50}],
+    '2023-05-24': []
+  });
+
+  return (
+    <Agenda
+      items={items}
+      loadItemsForMonth={(month) => {
+        console.log('Load items for', month);
+      }}
+      renderItem={(item) => (
+        <View style={{padding: 20, backgroundColor: 'white', margin: 10}}>
+          <Text>{item.name}</Text>
+        </View>
+      )}
+      renderEmptyDate={() => (
+        <View style={{padding: 20}}>
+          <Text>No events scheduled</Text>
+        </View>
+      )}
+    />
+  );
+}
+```
+
+### Agenda with custom theme
+
+```jsx
+<Agenda
+  items={items}
+  theme={{
+    agendaDayTextColor: '#7a7a7a',
+    agendaDayNumColor: '#7a7a7a',
+    agendaTodayColor: 'red',
+    agendaKnobColor: '#00adf5',
+    dotColor: '#00adf5',
+    selectedDayBackgroundColor: '#00adf5',
+    todayTextColor: '#00adf5'
+  }}
+  renderItem={(item) => (
+    <View style={{backgroundColor: 'white', padding: 10, margin: 5}}>
+      <Text>{item.name}</Text>
+    </View>
+  )}
+/>
+```
+
+### Agenda with pull-to-refresh
+
+```jsx
+import { useState } from 'react';
+
+function RefreshableAgenda() {
+  const [items, setItems] = useState({});
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadItems = () => {
+    setRefreshing(true);
+    // Fetch new items...
+    setTimeout(() => {
+      setItems({
+        '2023-05-22': [{name: 'Updated item'}]
+      });
+      setRefreshing(false);
+    }, 1000);
+  };
+
+  return (
+    <Agenda
+      items={items}
+      refreshing={refreshing}
+      onRefresh={loadItems}
+      renderItem={(item) => (
+        <View style={{padding: 20}}>
+          <Text>{item.name}</Text>
+        </View>
+      )}
+    />
+  );
+}
+```
+
+### Agenda with custom knob and day rendering
+
+```jsx
+<Agenda
+  items={items}
+  renderKnob={() => (
+    <View style={{
+      width: 50,
+      height: 5,
+      borderRadius: 3,
+      backgroundColor: '#00adf5',
+      marginTop: 10
+    }} />
+  )}
+  renderDay={(day, item) => (
+    <View style={{padding: 10, backgroundColor: '#f0f0f0'}}>
+      <Text style={{fontWeight: 'bold'}}>{day?.toString('ddd')}</Text>
+      <Text>{day?.getDate()}</Text>
+    </View>
+  )}
+  renderItem={(item) => (
+    <View style={{padding: 20, backgroundColor: 'white'}}>
+      <Text>{item.name}</Text>
+    </View>
+  )}
+/>
+```
+
+## Notes
+
+<Note>
+  The `items` object should use date strings in YYYY-MM-DD format as keys. Each item in the array should have a `height` property for proper list rendering.
+</Note>
+
+<Warning>
+  The `loadItemsForMonth` callback is only called for months that don't have items loaded yet. Make sure to populate the items object with data for the requested month.
+</Warning>
+
+## Related components
+
+- [CalendarList](/api/calendar-list) - The calendar component used internally
+- [ExpandableCalendar](/api/expandable-calendar) - Alternative expandable calendar view

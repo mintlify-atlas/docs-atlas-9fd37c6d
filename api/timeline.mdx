@@ -1,0 +1,447 @@
+---
+title: Timeline
+description: Timeline component for displaying events in a day/week view with time slots
+---
+
+The Timeline component displays events in a vertical timeline format with hourly slots, perfect for creating schedule and calendar applications.
+
+## Basic usage
+
+```jsx
+import { Timeline } from 'react-native-calendars';
+
+const events = [
+  {
+    start: '2023-05-16 09:00:00',
+    end: '2023-05-16 10:00:00',
+    title: 'Meeting',
+    summary: 'Team sync'
+  }
+];
+
+<Timeline
+  events={events}
+  date="2023-05-16"
+/>
+```
+
+## Props
+
+### Date and events
+
+<ParamField path="date" type="string | string[]">
+  The date or dates of this timeline instance in ISO format (YYYY-MM-DD). Can be a single date string or an array of date strings for multiple days.
+  
+  ```jsx
+  // Single day
+  date="2023-05-16"
+  
+  // Multiple days
+  date={['2023-05-16', '2023-05-17', '2023-05-18']}
+  ```
+</ParamField>
+
+<ParamField path="events" type="Event[]" required>
+  List of events to display in this timeline. Each event should have `start`, `end`, and other optional properties.
+  
+  ```typescript
+  [
+    {
+      start: '2023-05-16 09:00:00',
+      end: '2023-05-16 10:30:00',
+      title: 'Meeting',
+      summary: 'Weekly team sync',
+      color: 'blue'
+    }
+  ]
+  ```
+</ParamField>
+
+### Time range
+
+<ParamField path="start" type="number" default="0">
+  The timeline day start time (0-23).
+</ParamField>
+
+<ParamField path="end" type="number" default="24">
+  The timeline day end time (1-24).
+</ParamField>
+
+<ParamField path="format24h" type="boolean" default="true">
+  Whether to use 24-hour format for the timeline hours.
+</ParamField>
+
+### Event handlers
+
+<ParamField path="onEventPress" type="(event: Event) => void">
+  Handle event press.
+  
+  ```jsx
+  onEventPress={(event) => {
+    console.log('Event pressed:', event.title);
+  }}
+  ```
+</ParamField>
+
+<ParamField path="eventTapped" type="(event: Event) => void">
+  <Warning>Deprecated: Use `onEventPress` instead.</Warning>
+</ParamField>
+
+<ParamField path="onBackgroundLongPress" type="(timeString: string, timeObject: {hour: number, minutes: number}) => void">
+  Pass to handle creation of a new event by long press on the timeline background.
+  
+  <Note>If passed, the date prop will be included in the returned time string (e.g., 2017-09-06 01:30:00)</Note>
+  
+  ```jsx
+  onBackgroundLongPress={(timeString, timeObject) => {
+    console.log('Create event at:', timeString);
+    console.log('Hour:', timeObject.hour, 'Minutes:', timeObject.minutes);
+  }}
+  ```
+</ParamField>
+
+<ParamField path="onBackgroundLongPressOut" type="(timeString: string, timeObject: {hour: number, minutes: number}) => void">
+  Pass to handle creation of a new event by long press out on the timeline background.
+  
+  <Note>If passed, the date prop will be included in the returned time string (e.g., 2017-09-06 01:30:00)</Note>
+</ParamField>
+
+### Scrolling
+
+<ParamField path="scrollToFirst" type="boolean">
+  Should scroll to the first event when loaded.
+</ParamField>
+
+<ParamField path="scrollToNow" type="boolean">
+  Should scroll to current time when loaded.
+</ParamField>
+
+<ParamField path="initialTime" type="{hour: number, minutes: number}">
+  Initial time to scroll to.
+  
+  ```jsx
+  initialTime={{hour: 9, minutes: 30}}
+  ```
+</ParamField>
+
+<ParamField path="scrollOffset" type="number">
+  A scroll offset value that the timeline will sync with (for manual scroll control).
+</ParamField>
+
+<ParamField path="onChangeOffset" type="(offset: number) => void">
+  Listen to onScroll event of the timeline component.
+  
+  ```jsx
+  onChangeOffset={(offset) => {
+    console.log('Timeline scrolled to:', offset);
+  }}
+  ```
+</ParamField>
+
+### Customization
+
+<ParamField path="renderEvent" type="(event: PackedEvent) => JSX.Element">
+  Render a custom event block.
+  
+  ```jsx
+  renderEvent={(event) => (
+    <View style={{backgroundColor: event.color, padding: 10}}>
+      <Text>{event.title}</Text>
+      <Text>{event.summary}</Text>
+    </View>
+  )}
+  ```
+</ParamField>
+
+<ParamField path="showNowIndicator" type="boolean">
+  Whether to show the current time indicator line.
+</ParamField>
+
+### Styling
+
+<ParamField path="theme" type="Theme">
+  Specify theme properties to override specific styles for timeline parts.
+  
+  ```typescript
+  {
+    timeLabel: {color: 'black', fontSize: 12},
+    eventTitle: {color: 'white'},
+    eventSummary: {color: 'white'},
+    line: {backgroundColor: '#e0e0e0'},
+    nowIndicatorLine: {backgroundColor: 'red'},
+    nowIndicatorKnob: {backgroundColor: 'red'}
+  }
+  ```
+</ParamField>
+
+<ParamField path="styles" type="Theme">
+  <Warning>Deprecated: Use `theme` instead. This prop is being phased out.</Warning>
+</ParamField>
+
+### Layout
+
+<ParamField path="overlapEventsSpacing" type="number" default="0">
+  Spacing between overlapping events in pixels.
+</ParamField>
+
+<ParamField path="rightEdgeSpacing" type="number" default="0">
+  Spacing to keep at the right edge (for background press) in pixels.
+</ParamField>
+
+<ParamField path="numberOfDays" type="number" default="1">
+  The number of days to present in the timeline calendar.
+</ParamField>
+
+<ParamField path="timelineLeftInset" type="number" default="0">
+  The left inset of the timeline calendar (sidebar width). Default is 72.
+</ParamField>
+
+### Unavailable hours
+
+<ParamField path="unavailableHours" type="UnavailableHours[]">
+  Range of unavailable hours to display differently.
+  
+  ```typescript
+  [
+    {start: 0, end: 8},    // Before 8 AM
+    {start: 18, end: 24}   // After 6 PM
+  ]
+  ```
+</ParamField>
+
+<ParamField path="unavailableHoursColor" type="string">
+  Background color for unavailable hours.
+  
+  ```jsx
+  unavailableHoursColor="#f0f0f0"
+  ```
+</ParamField>
+
+### Testing
+
+<ParamField path="testID" type="string">
+  Identifier for testing.
+</ParamField>
+
+## Event object
+
+Each event in the `events` array should have the following structure:
+
+```typescript
+interface Event {
+  start: string;           // ISO datetime (YYYY-MM-DD HH:mm:ss)
+  end: string;             // ISO datetime (YYYY-MM-DD HH:mm:ss)
+  title?: string;          // Event title
+  summary?: string;        // Event description
+  color?: string;          // Event color
+  id?: string | number;    // Unique identifier
+  [key: string]: any;      // Any additional properties
+}
+```
+
+## Examples
+
+### Basic timeline with events
+
+```jsx
+import { Timeline } from 'react-native-calendars';
+
+const events = [
+  {
+    start: '2023-05-16 09:00:00',
+    end: '2023-05-16 10:00:00',
+    title: 'Morning Meeting',
+    summary: 'Weekly team sync',
+    color: 'lightblue'
+  },
+  {
+    start: '2023-05-16 14:00:00',
+    end: '2023-05-16 15:30:00',
+    title: 'Client Call',
+    summary: 'Project discussion',
+    color: 'lightgreen'
+  }
+];
+
+<Timeline
+  events={events}
+  date="2023-05-16"
+  start={8}
+  end={18}
+  onEventPress={(event) => alert(event.title)}
+/>
+```
+
+### Timeline with custom theme
+
+```jsx
+<Timeline
+  events={events}
+  date="2023-05-16"
+  theme={{
+    timeLabel: {color: '#333', fontSize: 12},
+    eventTitle: {color: 'white', fontSize: 14},
+    eventSummary: {color: '#f0f0f0', fontSize: 12},
+    line: {backgroundColor: '#e0e0e0'},
+    nowIndicatorLine: {backgroundColor: 'red', height: 2},
+    nowIndicatorKnob: {backgroundColor: 'red', width: 8, height: 8}
+  }}
+  showNowIndicator
+/>
+```
+
+### Timeline with business hours
+
+```jsx
+<Timeline
+  events={events}
+  date="2023-05-16"
+  start={6}
+  end={22}
+  unavailableHours={[
+    {start: 0, end: 8},
+    {start: 18, end: 24}
+  ]}
+  unavailableHoursColor="#f5f5f5"
+  scrollToFirst
+/>
+```
+
+### Multi-day timeline
+
+```jsx
+const events = [
+  {
+    start: '2023-05-16 09:00:00',
+    end: '2023-05-16 10:00:00',
+    title: 'Day 1 Meeting'
+  },
+  {
+    start: '2023-05-17 14:00:00',
+    end: '2023-05-17 15:00:00',
+    title: 'Day 2 Meeting'
+  }
+];
+
+<Timeline
+  events={events}
+  date={['2023-05-16', '2023-05-17']}
+  numberOfDays={2}
+/>
+```
+
+### Timeline with custom event rendering
+
+```jsx
+<Timeline
+  events={events}
+  date="2023-05-16"
+  renderEvent={(event) => (
+    <View style={{
+      backgroundColor: event.color || '#007AFF',
+      padding: 8,
+      borderRadius: 4,
+      flex: 1
+    }}>
+      <Text style={{color: 'white', fontWeight: 'bold'}}>
+        {event.title}
+      </Text>
+      {event.summary && (
+        <Text style={{color: 'white', fontSize: 12}}>
+          {event.summary}
+        </Text>
+      )}
+    </View>
+  )}
+/>
+```
+
+### Timeline with long press to create events
+
+```jsx
+import { useState } from 'react';
+
+function MyTimeline() {
+  const [events, setEvents] = useState([]);
+
+  const handleLongPress = (timeString, timeObject) => {
+    const newEvent = {
+      start: timeString,
+      end: timeString, // You'd calculate the end time
+      title: 'New Event',
+      color: 'lightblue'
+    };
+    setEvents([...events, newEvent]);
+  };
+
+  return (
+    <Timeline
+      events={events}
+      date="2023-05-16"
+      onBackgroundLongPress={handleLongPress}
+      onEventPress={(event) => {
+        console.log('Edit event:', event);
+      }}
+    />
+  );
+}
+```
+
+### Timeline with scroll control
+
+```jsx
+import { useState } from 'react';
+
+function SyncedTimeline() {
+  const [scrollOffset, setScrollOffset] = useState(0);
+
+  return (
+    <>
+      <Timeline
+        events={events1}
+        date="2023-05-16"
+        scrollOffset={scrollOffset}
+        onChangeOffset={setScrollOffset}
+      />
+      <Timeline
+        events={events2}
+        date="2023-05-17"
+        scrollOffset={scrollOffset}
+        onChangeOffset={setScrollOffset}
+      />
+    </>
+  );
+}
+```
+
+### Timeline with 12-hour format
+
+```jsx
+<Timeline
+  events={events}
+  date="2023-05-16"
+  format24h={false}
+  start={9}
+  end={17}
+  initialTime={{hour: 9, minutes: 0}}
+/>
+```
+
+## Notes
+
+<Note>
+  Events are automatically positioned and sized based on their start and end times. Overlapping events are displayed side by side.
+</Note>
+
+<Note>
+  The Timeline component uses a ScrollView internally, so it can handle any number of hours and events.
+</Note>
+
+<Warning>
+  Make sure event times are in the correct format: 'YYYY-MM-DD HH:mm:ss'. Incorrect formats may cause events to not display properly.
+</Warning>
+
+## Related components
+
+- [WeekCalendar](/api/week-calendar) - Can be used together for a complete weekly schedule view
+- [CalendarProvider](/api/calendar-provider) - For integrated calendar and timeline views

@@ -1,0 +1,269 @@
+---
+title: CalendarUtils
+description: Utility functions and HOCs for working with calendar dates and components
+---
+
+The `CalendarUtils` module provides utility functions for date formatting and manipulation, as well as helper functions for working with calendar components.
+
+## Import
+
+```jsx
+import { CalendarUtils } from 'react-native-calendars';
+```
+
+## Functions
+
+### getCalendarDateString
+
+Converts various date formats to a calendar date string in 'yyyy-MM-dd' format.
+
+<ParamField path="date" type="Date | string | number | undefined">
+  Date value to convert. Can be:
+  - JavaScript Date object
+  - Date string
+  - Timestamp number
+  - undefined (returns undefined)
+</ParamField>
+
+**Returns:** `string | undefined` - Date string in 'yyyy-MM-dd' format or undefined
+
+```jsx
+import { CalendarUtils } from 'react-native-calendars';
+
+// From Date object
+const dateStr = CalendarUtils.getCalendarDateString(new Date());
+console.log(dateStr); // "2024-03-15"
+
+// From timestamp
+const fromTimestamp = CalendarUtils.getCalendarDateString(1710489600000);
+console.log(fromTimestamp); // "2024-03-15"
+
+// From string
+const fromString = CalendarUtils.getCalendarDateString('2024-03-15');
+console.log(fromString); // "2024-03-15"
+
+// Undefined input
+const fromUndefined = CalendarUtils.getCalendarDateString();
+console.log(fromUndefined); // undefined
+```
+
+### getDefaultLocale
+
+Gets the current default locale configuration from XDate.
+
+**Returns:** `object` - Current locale configuration object
+
+```jsx
+import { CalendarUtils } from 'react-native-calendars';
+
+const locale = CalendarUtils.getDefaultLocale();
+console.log(locale.monthNames); // ["January", "February", ...]
+console.log(locale.dayNamesShort); // ["Sun", "Mon", ...]
+```
+
+## Higher-order components
+
+### asCalendarConsumer
+
+Higher-order component that wraps a component to provide CalendarContext as a prop. Useful for class components that need access to calendar context.
+
+```jsx
+import { asCalendarConsumer } from 'react-native-calendars';
+```
+
+**Usage:**
+
+```jsx
+import React, { Component } from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { asCalendarConsumer } from 'react-native-calendars';
+
+class DateDisplay extends Component {
+  handleDatePress = () => {
+    const { context } = this.props;
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    context.setDate(
+      tomorrow.toISOString().split('T')[0],
+      'dayPress'
+    );
+  };
+
+  render() {
+    const { context } = this.props;
+    
+    return (
+      <View>
+        <Text>Current Date: {context.date}</Text>
+        <Text>Selected Date: {context.selectedDate}</Text>
+        <TouchableOpacity onPress={this.handleDatePress}>
+          <Text>Select Tomorrow</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+}
+
+export default asCalendarConsumer(DateDisplay);
+```
+
+**Props added by HOC:**
+
+<ResponseField name="context" type="CalendarContextProps">
+  Calendar context object with the following properties:
+  - `date` - Current visible date
+  - `prevDate` - Previous date
+  - `selectedDate` - Currently selected date
+  - `updateSource` - Source of last update
+  - `setDate` - Method to update the date
+  - `setDisabled` - Method to enable/disable today button
+  - `numberOfDays` - Number of days in timeline mode
+  - `timelineLeftInset` - Timeline sidebar width
+</ResponseField>
+
+## Usage examples
+
+### Converting dates for calendar
+
+```jsx
+import React from 'react';
+import { Calendar, CalendarUtils } from 'react-native-calendars';
+
+const MyCalendar = ({ selectedTimestamp }) => {
+  // Convert timestamp to calendar format
+  const dateString = CalendarUtils.getCalendarDateString(selectedTimestamp);
+
+  return (
+    <Calendar
+      current={dateString}
+      markedDates={{
+        [dateString]: { selected: true },
+      }}
+    />
+  );
+};
+```
+
+### Working with locale information
+
+```jsx
+import React from 'react';
+import { View, Text } from 'react-native';
+import { CalendarUtils } from 'react-native-calendars';
+
+const LocaleInfo = () => {
+  const locale = CalendarUtils.getDefaultLocale();
+
+  return (
+    <View>
+      <Text>Current Locale Month Names:</Text>
+      {locale.monthNames.map((month, index) => (
+        <Text key={index}>{month}</Text>
+      ))}
+    </View>
+  );
+};
+```
+
+### Class component with calendar context
+
+```jsx
+import React, { Component } from 'react';
+import { View, Text, Button, StyleSheet } from 'react-native';
+import {
+  CalendarProvider,
+  ExpandableCalendar,
+  asCalendarConsumer,
+} from 'react-native-calendars';
+
+class AgendaHeader extends Component {
+  goToPreviousWeek = () => {
+    const { context } = this.props;
+    const currentDate = new Date(context.date);
+    currentDate.setDate(currentDate.getDate() - 7);
+    context.setDate(
+      currentDate.toISOString().split('T')[0],
+      'dayPress'
+    );
+  };
+
+  goToNextWeek = () => {
+    const { context } = this.props;
+    const currentDate = new Date(context.date);
+    currentDate.setDate(currentDate.getDate() + 7);
+    context.setDate(
+      currentDate.toISOString().split('T')[0],
+      'dayPress'
+    );
+  };
+
+  render() {
+    const { context } = this.props;
+    
+    return (
+      <View style={styles.header}>
+        <Text style={styles.title}>Week of {context.date}</Text>
+        <View style={styles.buttons}>
+          <Button title="Previous" onPress={this.goToPreviousWeek} />
+          <Button title="Next" onPress={this.goToNextWeek} />
+        </View>
+      </View>
+    );
+  }
+}
+
+const ConnectedAgendaHeader = asCalendarConsumer(AgendaHeader);
+
+class App extends Component {
+  render() {
+    return (
+      <CalendarProvider date={new Date().toISOString().split('T')[0]}>
+        <ExpandableCalendar />
+        <ConnectedAgendaHeader />
+      </CalendarProvider>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  header: {
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+});
+```
+
+## TypeScript types
+
+```typescript
+// CalendarUtils default export
+interface CalendarUtilsType {
+  getCalendarDateString: (date?: Date | string | number) => string | undefined;
+  getDefaultLocale: () => any;
+}
+
+// asCalendarConsumer HOC
+function asCalendarConsumer<PROPS>(
+  WrappedComponent: React.ComponentType<any>
+): React.ComponentClass<PROPS>;
+
+// Props injected by asCalendarConsumer
+interface InjectedProps {
+  context: CalendarContextProps;
+}
+```
+
+## Related
+
+- [CalendarContext](/api/calendar-context) - Calendar context for functional components
+- [CalendarProvider](/api/calendar-provider) - Context provider component
+- [LocaleConfig](/api/locale-config) - Configure calendar localization

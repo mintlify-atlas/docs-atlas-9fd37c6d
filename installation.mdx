@@ -1,0 +1,131 @@
+---
+title: Installation
+description: Install and set up React Native Calendars in your project
+---
+
+# Installation
+
+Get started with React Native Calendars by installing the package in your React Native or Expo project.
+
+## Prerequisites
+
+Before installing React Native Calendars, ensure you have:
+
+- React Native 0.60 or higher
+- Node.js 18 or higher
+- React 16.8 or higher (for hooks support)
+
+## Install the package
+
+<CodeGroup>
+
+```bash npm
+npm install react-native-calendars
+```
+
+```bash yarn
+yarn add react-native-calendars
+```
+
+```bash pnpm
+pnpm add react-native-calendars
+```
+
+</CodeGroup>
+
+<Note>
+  React Native Calendars is implemented in pure JavaScript, so no native module linking is required.
+</Note>
+
+## Peer dependencies
+
+The library has the following peer dependencies that should already be in your project:
+
+- `react`
+- `react-native`
+
+The following dependencies are automatically installed:
+
+- `xdate` - Date manipulation library
+- `hoist-non-react-statics` - Utility for hoisting statics
+- `lodash` - Utility functions
+- `memoize-one` - Memoization utility
+- `prop-types` - Runtime type checking
+
+## Expo compatibility
+
+<Info>
+  React Native Calendars works seamlessly with Expo projects without requiring ejecting. Simply install the package and start using it.
+</Info>
+
+```bash
+npx expo install react-native-calendars
+```
+
+## Verify installation
+
+To verify that the installation was successful, try importing the Calendar component:
+
+```javascript
+import {Calendar} from 'react-native-calendars';
+```
+
+If the import succeeds without errors, you're ready to start building with React Native Calendars!
+
+## TypeScript support
+
+<Info>
+  React Native Calendars includes built-in TypeScript definitions. No additional @types packages are needed.
+</Info>
+
+The library exports TypeScript types for all components and props:
+
+```typescript
+import {Calendar, CalendarProps, DateData} from 'react-native-calendars';
+
+const MyCalendar: React.FC = () => {
+  const handleDayPress = (day: DateData) => {
+    console.log('Selected:', day.dateString);
+  };
+
+  return <Calendar onDayPress={handleDayPress} />;
+};
+```
+
+## Optional dependencies
+
+### Moment.js
+
+If you want to use Moment.js for date manipulation, you can optionally install it:
+
+<CodeGroup>
+
+```bash npm
+npm install moment
+```
+
+```bash yarn
+yarn add moment
+```
+
+</CodeGroup>
+
+<Note>
+  Moment.js is listed as an optional dependency. The library works perfectly fine with the built-in XDate library.
+</Note>
+
+## Next steps
+
+<Steps>
+  <Step title="Explore quick start">
+    Learn how to create your first calendar component in the [quick start guide](/quickstart).
+  </Step>
+  
+  <Step title="Browse examples">
+    Check out the example app in the GitHub repository for advanced usage patterns.
+  </Step>
+  
+  <Step title="Customize your calendar">
+    Explore theming options and customization in the component documentation.
+  </Step>
+</Steps>

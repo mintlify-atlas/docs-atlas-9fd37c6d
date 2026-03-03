@@ -1,0 +1,327 @@
+---
+title: ExpandableCalendar
+description: An expandable calendar component that can toggle between week and month views with pan gesture support
+---
+
+The ExpandableCalendar component provides an interactive calendar that can expand from a week view to a full month view, with smooth animations and gesture support.
+
+<Note>
+  The ExpandableCalendar should be wrapped with `CalendarProvider` to work properly.
+</Note>
+
+## Basic usage
+
+```jsx
+import { CalendarProvider, ExpandableCalendar } from 'react-native-calendars';
+
+<CalendarProvider date="2023-05-16">
+  <ExpandableCalendar
+    firstDay={1}
+    markedDates={{
+      '2023-05-16': {marked: true}
+    }}
+  />
+</CalendarProvider>
+```
+
+## Props
+
+ExpandableCalendar extends all [CalendarList props](/api/calendar-list).
+
+### Position and behavior
+
+<ParamField path="initialPosition" type="'open' | 'closed'" default="'closed'">
+  The initial position of the calendar. Use the exported `Positions` enum.
+  
+  ```jsx
+  import { ExpandableCalendar } from 'react-native-calendars';
+  
+  <ExpandableCalendar
+    initialPosition={ExpandableCalendar.positions.OPEN}
+  />
+  ```
+</ParamField>
+
+<ParamField path="disablePan" type="boolean">
+  Disable the pan gesture and prevent opening/closing of the calendar. The `initialPosition` will persist.
+</ParamField>
+
+<ParamField path="closeOnDayPress" type="boolean" default="true">
+  Whether to close the calendar when a day is pressed.
+</ParamField>
+
+### Gesture thresholds
+
+<ParamField path="openThreshold" type="number" default="30">
+  A threshold (in pixels) for opening the calendar with the pan gesture.
+</ParamField>
+
+<ParamField path="closeThreshold" type="number" default="30">
+  A threshold (in pixels) for closing the calendar with the pan gesture.
+</ParamField>
+
+### Display options
+
+<ParamField path="hideKnob" type="boolean">
+  Whether to hide the knob. Automatically hidden when `numberOfDays` > 1.
+</ParamField>
+
+<ParamField path="allowShadow" type="boolean" default="true">
+  Whether to have shadow/elevation for the calendar.
+</ParamField>
+
+<ParamField path="disableWeekScroll" type="boolean">
+  Whether to disable the week scroll in closed position.
+</ParamField>
+
+### Arrow customization
+
+<ParamField path="leftArrowImageSource" type="ImageSourcePropType">
+  Source for the left arrow image.
+  
+  ```jsx
+  leftArrowImageSource={require('./custom-left-arrow.png')}
+  ```
+</ParamField>
+
+<ParamField path="rightArrowImageSource" type="ImageSourcePropType">
+  Source for the right arrow image.
+  
+  ```jsx
+  rightArrowImageSource={require('./custom-right-arrow.png')}
+  ```
+</ParamField>
+
+### Event handlers
+
+<ParamField path="onCalendarToggled" type="(isOpen: boolean) => void">
+  Callback that fires when the calendar is opened or closed.
+  
+  ```jsx
+  onCalendarToggled={(isOpen) => {
+    console.log('Calendar is now', isOpen ? 'open' : 'closed');
+  }}
+  ```
+</ParamField>
+
+<ParamField path="onDayPress" type="(date: DateData) => void">
+  Handler which gets executed on day press.
+</ParamField>
+
+<ParamField path="onVisibleMonthsChange" type="(months: DateData[]) => void">
+  Handler which gets executed when visible months change.
+</ParamField>
+
+### CalendarList props
+
+Since ExpandableCalendar extends CalendarList, it also supports:
+
+<ParamField path="horizontal" type="boolean" default="true">
+  Whether to render the calendar list horizontally.
+</ParamField>
+
+<ParamField path="calendarStyle" type="ViewStyle">
+  Style for the calendar.
+</ParamField>
+
+<ParamField path="theme" type="Theme">
+  Theme object for styling the calendar.
+</ParamField>
+
+<ParamField path="firstDay" type="number" default="0">
+  First day of the week (0 = Sunday, 1 = Monday).
+</ParamField>
+
+<ParamField path="markedDates" type="MarkedDates">
+  Collection of dates that need to be marked.
+</ParamField>
+
+<ParamField path="hideArrows" type="boolean">
+  Hide month navigation arrows.
+</ParamField>
+
+<ParamField path="renderArrow" type="(direction: 'left' | 'right') => ReactNode">
+  Replace default arrows with custom ones.
+</ParamField>
+
+<ParamField path="onPressArrowLeft" type="(method: () => void, month?: XDate) => void">
+  Handler for left arrow press.
+</ParamField>
+
+<ParamField path="onPressArrowRight" type="(method: () => void, month?: XDate) => void">
+  Handler for right arrow press.
+</ParamField>
+
+### Accessibility
+
+<ParamField path="testID" type="string">
+  Test identifier for automated testing.
+</ParamField>
+
+## Positions enum
+
+The component exports a `positions` enum with the following values:
+
+- `ExpandableCalendar.positions.OPEN` - Calendar is fully expanded
+- `ExpandableCalendar.positions.CLOSED` - Calendar is collapsed to week view
+
+## Examples
+
+### Basic expandable calendar with CalendarProvider
+
+```jsx
+import { CalendarProvider, ExpandableCalendar } from 'react-native-calendars';
+import { useState } from 'react';
+
+function MyExpandableCalendar() {
+  const [selected, setSelected] = useState('');
+
+  return (
+    <CalendarProvider date={selected || '2023-05-16'}>
+      <ExpandableCalendar
+        firstDay={1}
+        markedDates={{
+          [selected]: {selected: true, selectedColor: 'blue'}
+        }}
+        onDayPress={(day) => setSelected(day.dateString)}
+      />
+    </CalendarProvider>
+  );
+}
+```
+
+### Expandable calendar with custom theme
+
+```jsx
+<CalendarProvider date="2023-05-16">
+  <ExpandableCalendar
+    theme={{
+      backgroundColor: '#ffffff',
+      calendarBackground: '#ffffff',
+      selectedDayBackgroundColor: '#00adf5',
+      selectedDayTextColor: '#ffffff',
+      todayTextColor: '#00adf5',
+      dotColor: '#00adf5',
+      arrowColor: '#00adf5'
+    }}
+    firstDay={1}
+    markedDates={{
+      '2023-05-16': {marked: true, dotColor: 'red'},
+      '2023-05-17': {marked: true, dotColor: 'blue'}
+    }}
+  />
+</CalendarProvider>
+```
+
+### Calendar starting in open position
+
+```jsx
+<CalendarProvider date="2023-05-16">
+  <ExpandableCalendar
+    initialPosition={ExpandableCalendar.positions.OPEN}
+    onCalendarToggled={(isOpen) => {
+      console.log('Calendar toggled:', isOpen);
+    }}
+  />
+</CalendarProvider>
+```
+
+### Disabled pan gesture
+
+```jsx
+<CalendarProvider date="2023-05-16">
+  <ExpandableCalendar
+    disablePan
+    initialPosition={ExpandableCalendar.positions.OPEN}
+    closeOnDayPress={false}
+  />
+</CalendarProvider>
+```
+
+### Custom arrows and thresholds
+
+```jsx
+<CalendarProvider date="2023-05-16">
+  <ExpandableCalendar
+    leftArrowImageSource={require('./custom-left.png')}
+    rightArrowImageSource={require('./custom-right.png')}
+    openThreshold={50}
+    closeThreshold={50}
+    renderArrow={(direction) => (
+      <Text style={{fontSize: 20}}>
+        {direction === 'left' ? '◀' : '▶'}
+      </Text>
+    )}
+  />
+</CalendarProvider>
+```
+
+### With week scroll disabled
+
+```jsx
+<CalendarProvider date="2023-05-16">
+  <ExpandableCalendar
+    disableWeekScroll
+    allowShadow={false}
+    hideKnob={true}
+  />
+</CalendarProvider>
+```
+
+### Complete example with AgendaList
+
+```jsx
+import {
+  CalendarProvider,
+  ExpandableCalendar,
+  AgendaList
+} from 'react-native-calendars';
+
+function CompleteAgenda() {
+  const [selected, setSelected] = useState('2023-05-16');
+  const [items, setItems] = useState({
+    '2023-05-16': [{name: 'Meeting'}],
+    '2023-05-17': [{name: 'Lunch'}]
+  });
+
+  return (
+    <CalendarProvider date={selected}>
+      <ExpandableCalendar
+        firstDay={1}
+        markedDates={{
+          [selected]: {selected: true}
+        }}
+        onDayPress={(day) => setSelected(day.dateString)}
+      />
+      <AgendaList
+        sections={items}
+        renderItem={(item) => (
+          <View style={{padding: 20, backgroundColor: 'white'}}>
+            <Text>{item.name}</Text>
+          </View>
+        )}
+      />
+    </CalendarProvider>
+  );
+}
+```
+
+## Notes
+
+<Warning>
+  Always wrap ExpandableCalendar with CalendarProvider. The component relies on the context provided by CalendarProvider to function properly.
+</Warning>
+
+<Note>
+  The knob is automatically hidden when using `numberOfDays` > 1 in the CalendarProvider.
+</Note>
+
+<Note>
+  When using horizontal mode, the calendar will automatically handle month transitions and week scrolling.
+</Note>
+
+## Related components
+
+- [CalendarProvider](/api/calendar-provider) - Required wrapper component
+- [WeekCalendar](/api/week-calendar) - Week view used internally
+- [Agenda](/api/agenda) - Can be used together for a complete agenda view

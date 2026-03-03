@@ -1,0 +1,274 @@
+---
+title: WeekCalendar
+description: Horizontal scrollable week calendar component for displaying a weekly view
+---
+
+The WeekCalendar component displays a horizontal scrollable week view, perfect for showing a focused weekly calendar interface.
+
+<Note>
+  The WeekCalendar should be wrapped with `CalendarProvider` to work properly.
+</Note>
+
+## Basic usage
+
+```jsx
+import { CalendarProvider, WeekCalendar } from 'react-native-calendars';
+
+<CalendarProvider date="2023-05-16">
+  <WeekCalendar
+    firstDay={1}
+    markedDates={{
+      '2023-05-16': {marked: true}
+    }}
+  />
+</CalendarProvider>
+```
+
+## Props
+
+WeekCalendar extends all [CalendarList props](/api/calendar-list).
+
+### Display options
+
+<ParamField path="allowShadow" type="boolean" default="true">
+  Whether to have shadow/elevation for the calendar.
+</ParamField>
+
+<ParamField path="hideDayNames" type="boolean">
+  Hide day names (Mon, Tue, etc.) at the top of the week calendar.
+</ParamField>
+
+<ParamField path="firstDay" type="number" default="0">
+  First day of the week (0 = Sunday, 1 = Monday).
+</ParamField>
+
+### Calendar styling
+
+<ParamField path="theme" type="Theme">
+  Theme object for styling the calendar.
+  
+  ```typescript
+  {
+    backgroundColor: '#ffffff',
+    calendarBackground: '#ffffff',
+    selectedDayBackgroundColor: '#00adf5',
+    selectedDayTextColor: '#ffffff',
+    todayTextColor: '#00adf5'
+  }
+  ```
+</ParamField>
+
+<ParamField path="style" type="ViewStyle">
+  Custom style for the week calendar container.
+</ParamField>
+
+<ParamField path="calendarWidth" type="number">
+  Width of the calendar. Defaults to screen width.
+</ParamField>
+
+### Marking dates
+
+<ParamField path="markedDates" type="MarkedDates">
+  Collection of dates that need to be marked. Only dates visible in the current week will be shown.
+  
+  ```jsx
+  markedDates={{
+    '2023-05-16': {
+      marked: true,
+      dotColor: 'red',
+      selected: true,
+      selectedColor: 'blue'
+    }
+  }}
+  ```
+</ParamField>
+
+### Event handlers
+
+<ParamField path="onDayPress" type="(date: DateData) => void">
+  Handler which gets executed on day press. If not provided, the CalendarProvider's `setDate` will be used.
+  
+  ```jsx
+  onDayPress={(day) => {
+    console.log('selected day', day);
+  }}
+  ```
+</ParamField>
+
+### Context props
+
+When used with CalendarProvider, the WeekCalendar automatically receives:
+
+- `date` - Current selected date
+- `numberOfDays` - Number of days to display (for custom day ranges)
+- `setDate` - Function to update the selected date
+- `timelineLeftInset` - Left inset for timeline integration
+
+### Accessibility
+
+<ParamField path="testID" type="string">
+  Test identifier for automated testing.
+</ParamField>
+
+## Examples
+
+### Basic week calendar
+
+```jsx
+import { CalendarProvider, WeekCalendar } from 'react-native-calendars';
+import { useState } from 'react';
+
+function MyWeekCalendar() {
+  const [selected, setSelected] = useState('2023-05-16');
+
+  return (
+    <CalendarProvider date={selected}>
+      <WeekCalendar
+        firstDay={1}
+        markedDates={{
+          [selected]: {selected: true, selectedColor: 'blue'}
+        }}
+        onDayPress={(day) => setSelected(day.dateString)}
+      />
+    </CalendarProvider>
+  );
+}
+```
+
+### Week calendar with custom theme
+
+```jsx
+<CalendarProvider date="2023-05-16">
+  <WeekCalendar
+    theme={{
+      backgroundColor: '#f5f5f5',
+      calendarBackground: '#ffffff',
+      selectedDayBackgroundColor: '#00adf5',
+      selectedDayTextColor: '#ffffff',
+      todayTextColor: '#00adf5',
+      dayTextColor: '#2d4150',
+      textDisabledColor: '#d9e1e8',
+      dotColor: '#00adf5',
+      selectedDotColor: '#ffffff'
+    }}
+  />
+</CalendarProvider>
+```
+
+### Week calendar without shadow
+
+```jsx
+<CalendarProvider date="2023-05-16">
+  <WeekCalendar
+    allowShadow={false}
+    style={{borderBottomWidth: 1, borderColor: '#e0e0e0'}}
+  />
+</CalendarProvider>
+```
+
+### Week calendar with marked dates
+
+```jsx
+<CalendarProvider date="2023-05-16">
+  <WeekCalendar
+    markedDates={{
+      '2023-05-15': {marked: true, dotColor: 'red'},
+      '2023-05-16': {selected: true, marked: true, selectedColor: 'blue'},
+      '2023-05-17': {marked: true, dotColor: 'green'},
+      '2023-05-18': {disabled: true, disableTouchEvent: true}
+    }}
+  />
+</CalendarProvider>
+```
+
+### Week calendar with custom day count
+
+```jsx
+<CalendarProvider
+  date="2023-05-16"
+  numberOfDays={5} // Show only 5 days
+>
+  <WeekCalendar
+    firstDay={1} // Start from Monday
+  />
+</CalendarProvider>
+```
+
+### Week calendar without day names
+
+```jsx
+<CalendarProvider date="2023-05-16">
+  <WeekCalendar
+    hideDayNames={true}
+    style={{height: 80}}
+  />
+</CalendarProvider>
+```
+
+### Complete example with timeline
+
+```jsx
+import {
+  CalendarProvider,
+  WeekCalendar,
+  TimelineList
+} from 'react-native-calendars';
+import { useState } from 'react';
+
+function WeeklySchedule() {
+  const [selected, setSelected] = useState('2023-05-16');
+  const [events, setEvents] = useState({
+    '2023-05-16': [
+      {start: '2023-05-16 09:00:00', end: '2023-05-16 10:00:00', title: 'Meeting'}
+    ]
+  });
+
+  return (
+    <CalendarProvider date={selected}>
+      <WeekCalendar
+        firstDay={1}
+        markedDates={{
+          [selected]: {selected: true}
+        }}
+      />
+      <TimelineList
+        events={events}
+        timelineProps={{
+          start: 8,
+          end: 18
+        }}
+      />
+    </CalendarProvider>
+  );
+}
+```
+
+## Internal behavior
+
+The WeekCalendar component:
+
+- Renders a horizontal FlatList with multiple weeks (6 pages before and after the current week)
+- Automatically syncs with CalendarProvider's date
+- Handles week navigation through scrolling
+- Updates the parent context when scrolling to a different week
+- Supports custom number of days through CalendarProvider's `numberOfDays` prop
+
+## Notes
+
+<Warning>
+  Always wrap WeekCalendar with CalendarProvider. The component relies on the context provided by CalendarProvider to function properly.
+</Warning>
+
+<Note>
+  The WeekCalendar only displays marked dates that are visible in the current week. Dates outside the visible week range will not show their markings.
+</Note>
+
+<Note>
+  When using `numberOfDays` in CalendarProvider, the WeekCalendar will display that number of days instead of the full week.
+</Note>
+
+## Related components
+
+- [CalendarProvider](/api/calendar-provider) - Required wrapper component
+- [ExpandableCalendar](/api/expandable-calendar) - Uses WeekCalendar internally
+- [Timeline](/api/timeline) - Can be used together for a weekly schedule view

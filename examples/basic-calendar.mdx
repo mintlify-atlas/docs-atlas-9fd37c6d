@@ -1,0 +1,208 @@
+---
+title: Basic calendar usage
+description: Learn how to implement a basic calendar with date selection and navigation
+---
+
+The `Calendar` component provides a simple and customizable monthly calendar view with support for date selection, swipe navigation, and various display options.
+
+## Basic implementation
+
+Here's a minimal example to get started with the Calendar component:
+
+```javascript
+import React from 'react';
+import {Calendar} from 'react-native-calendars';
+
+const App = () => {
+  return (
+    <Calendar
+      onDayPress={day => {
+        console.log('selected day', day);
+      }}
+    />
+  );
+};
+
+export default App;
+```
+
+## Selectable date with state
+
+Track the selected date using React state and display it visually:
+
+```javascript
+import React, {useState, useCallback} from 'react';
+import {Calendar} from 'react-native-calendars';
+
+const App = () => {
+  const [selected, setSelected] = useState('');
+
+  const onDayPress = useCallback((day) => {
+    setSelected(day.dateString);
+  }, []);
+
+  return (
+    <Calendar
+      enableSwipeMonths
+      current={'2024-11-06'}
+      onDayPress={onDayPress}
+      markedDates={{
+        [selected]: {
+          selected: true,
+          disableTouchEvent: true,
+          selectedColor: 'orange',
+          selectedTextColor: 'red'
+        }
+      }}
+    />
+  );
+};
+
+export default App;
+```
+
+<Tip>
+Use `enableSwipeMonths` to allow users to swipe left/right to navigate between months.
+</Tip>
+
+## Setting date boundaries
+
+Restrict selectable dates using `minDate` and `maxDate`:
+
+```javascript
+import React from 'react';
+import {Calendar, CalendarUtils} from 'react-native-calendars';
+
+const App = () => {
+  const getDate = (offset) => {
+    const date = new Date('2024-11-06');
+    date.setDate(date.getDate() + offset);
+    return CalendarUtils.getCalendarDateString(date);
+  };
+
+  return (
+    <Calendar
+      hideExtraDays
+      current={'2024-11-06'}
+      minDate={getDate(-6)}
+      maxDate={getDate(6)}
+      disableAllTouchEventsForDisabledDays
+    />
+  );
+};
+
+export default App;
+```
+
+<Info>
+Dates outside the `minDate` and `maxDate` range will be grayed out and non-interactive when `disableAllTouchEventsForDisabledDays` is enabled.
+</Info>
+
+## Week numbers and loading indicator
+
+Display week numbers and a loading indicator:
+
+```javascript
+import React from 'react';
+import {Calendar} from 'react-native-calendars';
+
+const App = () => {
+  return (
+    <Calendar
+      hideExtraDays
+      showWeekNumbers
+      displayLoadingIndicator
+    />
+  );
+};
+
+export default App;
+```
+
+## Styling options
+
+Customize the calendar appearance with styles:
+
+```javascript
+import React from 'react';
+import {Calendar} from 'react-native-calendars';
+import {StyleSheet} from 'react-native';
+
+const App = () => {
+  return (
+    <Calendar
+      style={styles.calendar}
+      current={'2024-11-06'}
+      onDayPress={day => console.log('selected day', day)}
+    />
+  );
+};
+
+const styles = StyleSheet.create({
+  calendar: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    height: 350
+  }
+});
+
+export default App;
+```
+
+## Key props
+
+<CodeGroup>
+
+```javascript Calendar Props
+<Calendar
+  // Initial date to display
+  current={'2024-11-06'}
+  
+  // Minimum selectable date
+  minDate={'2024-11-01'}
+  
+  // Maximum selectable date
+  maxDate={'2024-11-30'}
+  
+  // Callback when day is pressed
+  onDayPress={(day) => console.log(day)}
+  
+  // Callback when month changes
+  onMonthChange={(month) => console.log(month)}
+  
+  // Hide days from other months
+  hideExtraDays={true}
+  
+  // Enable swipe gestures
+  enableSwipeMonths={true}
+  
+  // Show week numbers
+  showWeekNumbers={false}
+  
+  // First day of week (0 = Sunday, 1 = Monday)
+  firstDay={0}
+  
+  // Disable month change on day press
+  disableMonthChange={false}
+/>
+```
+
+</CodeGroup>
+
+## Day data object
+
+When a day is pressed, the callback receives a `DateData` object:
+
+```javascript
+{
+  dateString: '2024-11-06',  // Date in 'YYYY-MM-DD' format
+  day: 6,                     // Day of the month (1-31)
+  month: 11,                  // Month (1-12)
+  year: 2024,                 // Year
+  timestamp: 1699228800000    // Unix timestamp
+}
+```
+
+<Note>
+All date strings in the library use the `YYYY-MM-DD` format for consistency.
+</Note>

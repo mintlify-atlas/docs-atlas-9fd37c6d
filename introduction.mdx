@@ -1,0 +1,128 @@
+---
+title: React Native Calendars
+description: A declarative cross-platform React Native calendar component for iOS and Android
+---
+
+# React Native Calendars
+
+A declarative cross-platform React Native calendar component for iOS and Android. This powerful library provides highly customizable calendar components with support for marking dates, themes, localization, and multiple calendar types.
+
+## Key features
+
+<CardGroup cols={2}>
+  <Card title="Pure JavaScript" icon="js">
+    No native code linking required. Works seamlessly with Expo and bare React Native projects.
+  </Card>
+  
+  <Card title="Highly customizable" icon="paintbrush">
+    Customize colors, fonts, and layouts with a comprehensive theming system.
+  </Card>
+  
+  <Card title="Multiple calendar types" icon="calendar">
+    Choose from Calendar, CalendarList, Agenda, and ExpandableCalendar components.
+  </Card>
+  
+  <Card title="Date marking" icon="circle-dot">
+    Support for dot, multi-dot, period, multi-period, and custom marking styles.
+  </Card>
+  
+  <Card title="Swipe gestures" icon="hand">
+    Built-in swipe support for navigating between months with smooth animations.
+  </Card>
+  
+  <Card title="Accessibility" icon="universal-access">
+    Full accessibility support for screen readers and assistive technologies.
+  </Card>
+  
+  <Card title="Localization" icon="globe">
+    Automatic date formatting for different locales with configurable month and day names.
+  </Card>
+  
+  <Card title="Date constraints" icon="lock">
+    Set minimum and maximum dates, disable specific days of the week, or block certain dates.
+  </Card>
+</CardGroup>
+
+## Available components
+
+### Calendar
+
+The basic calendar component with month view, date selection, and marking support.
+
+```javascript
+import {Calendar} from 'react-native-calendars';
+
+<Calendar
+  onDayPress={day => {
+    console.log('selected day', day);
+  }}
+  markedDates={{
+    '2024-03-15': {selected: true, selectedColor: 'blue'}
+  }}
+/>
+```
+
+### CalendarList
+
+A scrollable list of calendars that allows users to scroll through months vertically or horizontally.
+
+```javascript
+import {CalendarList} from 'react-native-calendars';
+
+<CalendarList
+  pastScrollRange={12}
+  futureScrollRange={12}
+  horizontal={true}
+  pagingEnabled
+/>
+```
+
+### Agenda
+
+A calendar combined with a scrollable list of events and appointments.
+
+```javascript
+import {Agenda} from 'react-native-calendars';
+
+<Agenda
+  items={{
+    '2024-03-15': [{name: 'Meeting at 10am'}],
+    '2024-03-16': [{name: 'Lunch with team'}]
+  }}
+  renderItem={(item) => <View><Text>{item.name}</Text></View>}
+/>
+```
+
+### ExpandableCalendar
+
+An expandable calendar with week view that can be collapsed and expanded.
+
+```javascript
+import {ExpandableCalendar, CalendarProvider} from 'react-native-calendars';
+
+<CalendarProvider date='2024-03-15'>
+  <ExpandableCalendar />
+</CalendarProvider>
+```
+
+## Get started
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Install the package and set up your project
+  </Card>
+  
+  <Card title="Quick start" icon="rocket" href="/quickstart">
+    Build your first calendar in minutes
+  </Card>
+</CardGroup>
+
+## Platform compatibility
+
+<Info>
+  React Native Calendars is compatible with both iOS and Android. It also works seamlessly with Expo projects without ejecting.
+</Info>
+
+## Community and support
+
+React Native Calendars is an open-source project maintained by Wix and the community. For issues, feature requests, or contributions, visit the [GitHub repository](https://github.com/wix/react-native-calendars).

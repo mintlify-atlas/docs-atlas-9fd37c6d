@@ -1,0 +1,542 @@
+---
+title: Accessibility
+description: Make your calendars accessible to all users with built-in accessibility features
+---
+
+React Native Calendars includes built-in accessibility features to ensure your calendar is usable by everyone, including users with disabilities who rely on screen readers and other assistive technologies.
+
+## Built-in accessibility features
+
+All calendar components include accessibility support by default:
+
+- **Screen reader support**: Proper `accessibilityRole` and `accessibilityLabel` attributes
+- **Keyboard navigation**: Components respond to touch and keyboard events
+- **Focus management**: Interactive elements are properly focusable
+- **State announcements**: Selected, disabled, and today states are announced
+
+## Accessibility roles
+
+Calendar components use appropriate accessibility roles:
+
+```tsx
+// From source: src/calendar/day/basic/index.tsx:201
+<TouchableOpacity
+  accessible
+  accessibilityRole={isDisabled ? undefined : 'button'}
+  accessibilityLabel={accessibilityLabel}
+>
+```
+
+- **Date cells**: Use `button` role when interactive
+- **Disabled dates**: Role is removed to indicate non-interactivity
+- **Header navigation**: Use `adjustable` role for month navigation
+
+## Custom accessibility labels
+
+Provide custom accessibility labels for marked dates to give users context:
+
+```tsx
+<Calendar
+  markedDates={{
+    '2024-03-15': {
+      marked: true,
+      accessibilityLabel: 'Team meeting at 3 PM'
+    },
+    '2024-03-16': {
+      selected: true,
+      accessibilityLabel: 'Selected date: March 16, 2024'
+    },
+    '2024-03-17': {
+      marked: true,
+      dots: [
+        { color: 'blue' },
+        { color: 'red' }
+      ],
+      accessibilityLabel: 'Two events: Morning standup and Afternoon review'
+    }
+  }}
+/>
+```
+
+### Accessibility label interface
+
+From the source code:
+
+```typescript
+// src/calendar/day/marking/index.tsx:57
+export interface MarkingProps extends DotProps {
+  // ... other props
+  accessibilityLabel?: string;
+}
+```
+
+<ParamField path="accessibilityLabel" type="string">
+  Custom text announced by screen readers. Provides context about the date's significance.
+</ParamField>
+
+## Automatic accessibility labels
+
+When you don't provide a custom label, the calendar generates one automatically:
+
+```tsx
+// From source: src/calendar/day/index.tsx:38-39
+const getAccessibilityLabel = () => {
+  if (marking.accessibilityLabel) {
+    return marking.accessibilityLabel;
+  }
+  // ... automatic label generation
+};
+```
+
+Automatic labels include:
+- Date information
+- Selection state
+- Disabled state
+- Marked/unmarked state
+
+## Disabling touch events
+
+Control touch event behavior for better accessibility:
+
+```tsx
+<Calendar
+  // Disable touch for all disabled days
+  disableAllTouchEventsForDisabledDays={true}
+  // Disable touch for all inactive days
+  disableAllTouchEventsForInactiveDays={true}
+  markedDates={{
+    '2024-03-15': {
+      disabled: true
+    },
+    '2024-03-16': {
+      inactive: true
+    },
+    '2024-03-17': {
+      // Override global setting for specific date
+      disableTouchEvent: false
+    }
+  }}
+/>
+```
+
+<ParamField path="disableAllTouchEventsForDisabledDays" type="boolean">
+  When `true`, disabled dates cannot be tapped. Can be overridden per date with `disableTouchEvent`.
+</ParamField>
+
+<ParamField path="disableAllTouchEventsForInactiveDays" type="boolean">
+  When `true`, inactive dates (outside current month) cannot be tapped. Can be overridden per date with `disableTouchEvent`.
+</ParamField>
+
+<ParamField path="disableTouchEvent" type="boolean">
+  Disable touch events for a specific date in `markedDates`
+</ParamField>
+
+## State-specific accessibility
+
+Different date states are announced to screen reader users:
+
+<Tabs>
+  <Tab title="Selected dates">
+    ```tsx
+    <Calendar
+      markedDates={{
+        '2024-03-15': {
+          selected: true,
+          accessibilityLabel: 'Selected: March 15, 2024'
+        }
+      }}
+    />
+    ```
+    
+    Screen readers announce the selected state and custom label.
+  </Tab>
+  
+  <Tab title="Disabled dates">
+    ```tsx
+    <Calendar
+      markedDates={{
+        '2024-03-15': {
+          disabled: true,
+          accessibilityLabel: 'March 15, 2024 - Not available'
+        }
+      }}
+    />
+    ```
+    
+    Disabled dates have no `accessibilityRole`, indicating they're not interactive.
+  </Tab>
+  
+  <Tab title="Today">
+    ```tsx
+    <Calendar
+      markedDates={{
+        '2024-03-15': {
+          today: true,
+          accessibilityLabel: "Today's date: March 15, 2024"
+        }
+      }}
+    />
+    ```
+    
+    Today's date is specially styled and announced.
+  </Tab>
+  
+  <Tab title="Inactive dates">
+    ```tsx
+    <Calendar
+      markedDates={{
+        '2024-02-29': {
+          inactive: true,
+          accessibilityLabel: 'February 29 - Previous month'
+        }
+      }}
+    />
+    ```
+    
+    Inactive dates (outside current month) can have descriptive labels.
+  </Tab>
+</Tabs>
+
+## Period marking accessibility
+
+For period markings, provide context about the date range:
+
+```tsx
+<Calendar
+  markingType="period"
+  markedDates={{
+    '2024-03-15': {
+      startingDay: true,
+      color: 'blue',
+      accessibilityLabel: 'Start of vacation - March 15'
+    },
+    '2024-03-16': {
+      color: 'blue',
+      accessibilityLabel: 'Vacation - March 16'
+    },
+    '2024-03-17': {
+      endingDay: true,
+      color: 'blue',
+      accessibilityLabel: 'End of vacation - March 17'
+    }
+  }}
+/>
+```
+
+<Info>
+  Clearly indicate the start, middle, and end of periods in accessibility labels to help users understand date ranges.
+</Info>
+
+## Multi-dot marking accessibility
+
+Describe multiple events on the same date:
+
+```tsx
+<Calendar
+  markingType="multi-dot"
+  markedDates={{
+    '2024-03-15': {
+      dots: [
+        { color: 'blue', key: 'work' },
+        { color: 'green', key: 'personal' },
+        { color: 'red', key: 'important' }
+      ],
+      accessibilityLabel: 'March 15 - 3 events: Work meeting, Personal appointment, Important deadline'
+    }
+  }}
+/>
+```
+
+## Header accessibility
+
+Month navigation arrows are accessible:
+
+```tsx
+// From source: src/calendar/header/index.tsx:292
+<View accessibilityRole={'adjustable'}>
+  {/* Arrow navigation */}
+</View>
+```
+
+The `adjustable` role tells screen readers that users can swipe to change values (months).
+
+## Day names accessibility
+
+Day names in the header have empty accessibility labels to avoid redundant announcements:
+
+```tsx
+// From source: src/calendar/header/index.tsx:197
+<Text
+  allowFontScaling={false}
+  style={dayStyle}
+  numberOfLines={1}
+  accessibilityLabel={''}
+>
+  {day}
+</Text>
+```
+
+## Testing accessibility
+
+### iOS VoiceOver
+
+1. Enable VoiceOver: Settings → Accessibility → VoiceOver
+2. Navigate with swipes:
+   - Swipe right: Move to next element
+   - Swipe left: Move to previous element
+   - Double-tap: Activate element
+3. Test calendar navigation:
+   - Can you navigate between dates?
+   - Are date labels clear and descriptive?
+   - Can you activate dates?
+   - Are disabled dates properly announced?
+
+### Android TalkBack
+
+1. Enable TalkBack: Settings → Accessibility → TalkBack
+2. Navigate with swipes:
+   - Swipe right: Move to next element
+   - Swipe left: Move to previous element
+   - Double-tap: Activate element
+3. Test calendar navigation:
+   - Can you navigate between dates?
+   - Are date labels clear and descriptive?
+   - Can you activate dates?
+   - Are disabled dates properly announced?
+
+## Active opacity for touch feedback
+
+Provide visual feedback for touch interactions:
+
+```tsx
+<Calendar
+  markedDates={{
+    '2024-03-15': {
+      marked: true,
+      activeOpacity: 0.5 // Dim to 50% opacity when touched
+    },
+    '2024-03-16': {
+      disabled: true,
+      activeOpacity: 1 // No opacity change for disabled dates
+    }
+  }}
+/>
+```
+
+<ParamField path="activeOpacity" type="number">
+  Opacity value (0-1) when the date is being touched. Default is around 0.2.
+</ParamField>
+
+<Note>
+  Active opacity provides visual feedback to all users, including those with motor impairments who may need confirmation of successful touch events.
+</Note>
+
+## Best practices
+
+<Accordion title="Provide meaningful labels">
+  Always include descriptive accessibility labels for marked dates:
+  
+  ```tsx
+  // ❌ Bad: No context
+  markedDates={{
+    '2024-03-15': { marked: true }
+  }}
+  
+  // ✅ Good: Descriptive context
+  markedDates={{
+    '2024-03-15': {
+      marked: true,
+      accessibilityLabel: 'Doctor appointment at 2 PM'
+    }
+  }}
+  ```
+</Accordion>
+
+<Accordion title="Announce state changes">
+  Update accessibility labels when date states change:
+  
+  ```tsx
+  const [selected, setSelected] = useState('');
+  
+  <Calendar
+    onDayPress={(day) => setSelected(day.dateString)}
+    markedDates={{
+      [selected]: {
+        selected: true,
+        accessibilityLabel: `Selected date: ${selected}`
+      }
+    }}
+  />
+  ```
+</Accordion>
+
+<Accordion title="Test with real assistive technology">
+  Don't rely solely on automated testing:
+  - Test with VoiceOver on iOS
+  - Test with TalkBack on Android
+  - Test with external keyboard navigation
+  - Ask users with disabilities to test your implementation
+</Accordion>
+
+<Accordion title="Consider cognitive accessibility">
+  - Use consistent visual indicators
+  - Provide clear labels and instructions
+  - Avoid overly complex interactions
+  - Use sufficient color contrast (see theming)
+</Accordion>
+
+<Accordion title="Disable touch on non-interactive dates">
+  Prevent confusion by disabling touch on dates that shouldn't be interactive:
+  
+  ```tsx
+  <Calendar
+    disableAllTouchEventsForDisabledDays={true}
+    disableAllTouchEventsForInactiveDays={true}
+  />
+  ```
+</Accordion>
+
+## Color contrast
+
+Ensure sufficient color contrast for users with visual impairments:
+
+```tsx
+<Calendar
+  theme={{
+    // High contrast theme
+    calendarBackground: '#ffffff',
+    dayTextColor: '#000000', // Black on white: 21:1 contrast
+    selectedDayBackgroundColor: '#0066cc',
+    selectedDayTextColor: '#ffffff', // White on blue: 4.5:1 contrast
+    todayTextColor: '#cc0000',
+    textDisabledColor: '#757575' // Gray on white: 4.5:1 contrast
+  }}
+/>
+```
+
+<Warning>
+  WCAG 2.1 Level AA requires a contrast ratio of at least 4.5:1 for normal text and 3:1 for large text. Use a contrast checker tool to verify your theme colors.
+</Warning>
+
+## Semantic HTML equivalents
+
+While React Native doesn't use HTML, here are the semantic equivalents:
+
+| React Native Component | Accessibility Role | HTML Equivalent |
+|------------------------|-------------------|------------------|
+| Date cell (interactive) | `button` | `<button>` |
+| Date cell (disabled) | (none) | `<div>` |
+| Month navigation | `adjustable` | `<input type="range">` |
+| Calendar container | (none) | `<table role="grid">` |
+
+## WCAG compliance
+
+React Native Calendars supports WCAG 2.1 Level AA compliance when configured properly:
+
+<Accordion title="Perceivable">
+  - ✅ Text alternatives via `accessibilityLabel`
+  - ✅ Distinguishable content via theme colors
+  - ⚠️ Color contrast depends on your theme configuration
+</Accordion>
+
+<Accordion title="Operable">
+  - ✅ Keyboard accessible (touch events)
+  - ✅ Enough time for interactions
+  - ✅ Navigable via screen reader
+  - ✅ Input modalities (touch, screen reader)
+</Accordion>
+
+<Accordion title="Understandable">
+  - ✅ Readable with LocaleConfig
+  - ✅ Predictable navigation
+  - ⚠️ Input assistance depends on your `accessibilityLabel` implementation
+</Accordion>
+
+<Accordion title="Robust">
+  - ✅ Compatible with assistive technologies
+  - ✅ Standard React Native accessibility APIs
+</Accordion>
+
+## Example: Fully accessible calendar
+
+```tsx
+import React, { useState } from 'react';
+import { Calendar } from 'react-native-calendars';
+
+function AccessibleCalendar() {
+  const [selected, setSelected] = useState('');
+  const [events] = useState({
+    '2024-03-15': { title: 'Team meeting', time: '3:00 PM' },
+    '2024-03-16': { title: 'Project deadline', time: '5:00 PM' },
+    '2024-03-20': { title: 'Conference', time: 'All day' }
+  });
+
+  const getAccessibilityLabel = (dateString) => {
+    const event = events[dateString];
+    const isSelected = dateString === selected;
+    
+    let label = dateString;
+    
+    if (event) {
+      label += `, ${event.title} at ${event.time}`;
+    }
+    
+    if (isSelected) {
+      label = 'Selected: ' + label;
+    }
+    
+    return label;
+  };
+
+  const markedDates = {};
+  
+  // Add events
+  Object.keys(events).forEach(date => {
+    markedDates[date] = {
+      marked: true,
+      dotColor: 'blue',
+      accessibilityLabel: getAccessibilityLabel(date)
+    };
+  });
+  
+  // Add selected date
+  if (selected) {
+    markedDates[selected] = {
+      ...markedDates[selected],
+      selected: true,
+      selectedColor: 'blue',
+      accessibilityLabel: getAccessibilityLabel(selected)
+    };
+  }
+
+  return (
+    <Calendar
+      markedDates={markedDates}
+      onDayPress={(day) => {
+        setSelected(day.dateString);
+      }}
+      disableAllTouchEventsForDisabledDays={true}
+      theme={{
+        // High contrast theme
+        calendarBackground: '#ffffff',
+        dayTextColor: '#000000',
+        selectedDayBackgroundColor: '#0066cc',
+        selectedDayTextColor: '#ffffff',
+        todayTextColor: '#cc0000',
+        textDisabledColor: '#757575',
+        dotColor: '#0066cc',
+        selectedDotColor: '#ffffff'
+      }}
+    />
+  );
+}
+
+export default AccessibleCalendar;
+```
+
+This example demonstrates:
+- Custom accessibility labels with event information
+- Selected state announcement
+- High contrast colors
+- Disabled touch events for non-interactive dates
+- Proper marking and selection handling

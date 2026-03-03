@@ -1,0 +1,258 @@
+---
+title: CalendarContext
+description: React Context for accessing calendar state and methods in child components
+---
+
+The `CalendarContext` provides access to the calendar state managed by CalendarProvider. Use this context to read the current date, selected date, and call methods to update the calendar state from any child component.
+
+## Import
+
+```jsx
+import { CalendarContext } from 'react-native-calendars';
+```
+
+## Usage with useContext
+
+```jsx
+import React, { useContext } from 'react';
+import { View, Text, Button } from 'react-native';
+import { CalendarContext } from 'react-native-calendars';
+
+const MyComponent = () => {
+  const context = useContext(CalendarContext);
+
+  return (
+    <View>
+      <Text>Current Date: {context.date}</Text>
+      <Text>Selected Date: {context.selectedDate}</Text>
+      <Button
+        title="Select Tomorrow"
+        onPress={() => {
+          const tomorrow = new Date();
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          context.setDate(
+            tomorrow.toISOString().split('T')[0],
+            'dayPress'
+          );
+        }}
+      />
+    </View>
+  );
+};
+```
+
+## Usage with asCalendarConsumer
+
+For class components, use the `asCalendarConsumer` higher-order component:
+
+```jsx
+import React, { Component } from 'react';
+import { View, Text } from 'react-native';
+import { asCalendarConsumer } from 'react-native-calendars';
+
+class MyComponent extends Component {
+  render() {
+    const { context } = this.props;
+    
+    return (
+      <View>
+        <Text>Current Date: {context.date}</Text>
+        <Text>Selected Date: {context.selectedDate}</Text>
+      </View>
+    );
+  }
+}
+
+export default asCalendarConsumer(MyComponent);
+```
+
+## Context properties
+
+<ResponseField name="date" type="string">
+  The current visible date in 'yyyy-MM-dd' format. This represents the month/week currently being displayed in the calendar.
+  
+  ```jsx
+  const context = useContext(CalendarContext);
+  console.log(context.date); // "2024-03-15"
+  ```
+</ResponseField>
+
+<ResponseField name="prevDate" type="string">
+  The previous date before the last update in 'yyyy-MM-dd' format. Useful for detecting date changes and transitions.
+  
+  ```jsx
+  const context = useContext(CalendarContext);
+  console.log(context.prevDate); // "2024-03-14"
+  ```
+</ResponseField>
+
+<ResponseField name="selectedDate" type="string">
+  The currently selected date in 'yyyy-MM-dd' format. This is the date highlighted as selected in the calendar.
+  
+  ```jsx
+  const context = useContext(CalendarContext);
+  console.log(context.selectedDate); // "2024-03-15"
+  ```
+</ResponseField>
+
+<ResponseField name="updateSource" type="UpdateSources">
+  The source of the last calendar update. Possible values:
+  - `'calendarInit'` - Initial calendar setup
+  - `'propUpdate'` - Date prop changed
+  - `'todayPress'` - Today button pressed
+  - `'dayPress'` - Day was pressed
+  - `'arrowPress'` - Month arrow pressed
+  - `'weekArrowPress'` - Week arrow pressed
+  - `'listDrag'` - Agenda list scrolled
+  - `'pageScroll'` - Calendar scrolled
+  - `'weekScroll'` - Week calendar scrolled
+  
+  ```jsx
+  const context = useContext(CalendarContext);
+  if (context.updateSource === 'dayPress') {
+    console.log('User selected a day');
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="numberOfDays" type="number | undefined">
+  Number of days displayed in timeline/week calendar mode. Only set when using multi-day views.
+  
+  ```jsx
+  const context = useContext(CalendarContext);
+  console.log(context.numberOfDays); // 7
+  ```
+</ResponseField>
+
+<ResponseField name="timelineLeftInset" type="number | undefined">
+  Left inset width for timeline calendar (sidebar width) in pixels. Default is 72.
+  
+  ```jsx
+  const context = useContext(CalendarContext);
+  console.log(context.timelineLeftInset); // 72
+  ```
+</ResponseField>
+
+## Context methods
+
+<ResponseField name="setDate" type="(date: string, source: UpdateSources) => void">
+  Updates the calendar to show and select a new date.
+  
+  **Parameters:**
+  - `date` - Date string in 'yyyy-MM-dd' format
+  - `source` - Update source identifier (typically `'dayPress'` for programmatic updates)
+  
+  ```jsx
+  const context = useContext(CalendarContext);
+  
+  // Jump to a specific date
+  context.setDate('2024-12-25', 'dayPress');
+  ```
+</ResponseField>
+
+<ResponseField name="setDisabled" type="(disable: boolean) => void">
+  Enables or disables the today button (if shown).
+  
+  **Parameters:**
+  - `disable` - Whether to disable the today button
+  
+  ```jsx
+  const context = useContext(CalendarContext);
+  
+  // Disable today button
+  context.setDisabled(true);
+  
+  // Enable today button
+  context.setDisabled(false);
+  ```
+</ResponseField>
+
+## Complete example
+
+```jsx
+import React, { useContext, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  CalendarProvider,
+  CalendarContext,
+  ExpandableCalendar,
+} from 'react-native-calendars';
+
+const DateNavigator = () => {
+  const context = useContext(CalendarContext);
+
+  const goToToday = () => {
+    const today = new Date().toISOString().split('T')[0];
+    context.setDate(today, 'todayPress');
+  };
+
+  const goToNextWeek = () => {
+    const currentDate = new Date(context.date);
+    currentDate.setDate(currentDate.getDate() + 7);
+    context.setDate(
+      currentDate.toISOString().split('T')[0],
+      'dayPress'
+    );
+  };
+
+  return (
+    <View style={styles.navigator}>
+      <Text>Current: {context.date}</Text>
+      <Text>Selected: {context.selectedDate}</Text>
+      <Text>Source: {context.updateSource}</Text>
+      
+      <TouchableOpacity style={styles.button} onPress={goToToday}>
+        <Text>Go to Today</Text>
+      </TouchableOpacity>
+      
+      <TouchableOpacity style={styles.button} onPress={goToNextWeek}>
+        <Text>Next Week</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+const App = () => {
+  return (
+    <CalendarProvider date={new Date().toISOString().split('T')[0]}>
+      <ExpandableCalendar />
+      <DateNavigator />
+    </CalendarProvider>
+  );
+};
+
+const styles = StyleSheet.create({
+  navigator: {
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+  },
+  button: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#4A90E2',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+});
+```
+
+## TypeScript interface
+
+```typescript
+interface CalendarContextProps {
+  date: string;
+  prevDate: string;
+  selectedDate: string;
+  setDate: (date: string, source: UpdateSources) => void;
+  updateSource: UpdateSources;
+  setDisabled: (disable: boolean) => void;
+  numberOfDays?: number;
+  timelineLeftInset?: number;
+}
+```
+
+## Related
+
+- [CalendarProvider](/api/calendar-provider) - Provider component that creates the context
+- [asCalendarConsumer](/api/calendar-utils#ascalendarconsumer) - HOC for class components
+- [ExpandableCalendar](/api/expandable-calendar) - Calendar component that uses context

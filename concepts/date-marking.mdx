@@ -1,0 +1,391 @@
+---
+title: Date marking
+description: Learn about the different date marking types available in React Native Calendars
+---
+
+React Native Calendars provides five different marking types to visually indicate special dates. Each marking type offers unique styling capabilities to suit different use cases.
+
+## Marking types
+
+The library supports the following marking types:
+
+```typescript
+type MarkingTypes = 'dot' | 'multi-dot' | 'period' | 'multi-period' | 'custom';
+```
+
+## Dot marking
+
+The simplest marking type displays a small colored dot below the date. Perfect for indicating events or important dates.
+
+```tsx
+<Calendar
+  markedDates={{
+    '2024-03-15': { marked: true, dotColor: 'red' },
+    '2024-03-16': { marked: true },
+    '2024-03-17': { selected: true, marked: true, dotColor: 'red' }
+  }}
+/>
+```
+
+### Dot properties
+
+<ParamField path="marked" type="boolean">
+  Whether the date should display a dot marker
+</ParamField>
+
+<ParamField path="dotColor" type="string">
+  Custom color for the dot. Defaults to theme's `dotColor`
+</ParamField>
+
+<ParamField path="selectedDotColor" type="string">
+  Dot color when the date is selected. Defaults to theme's `selectedDotColor`
+</ParamField>
+
+## Multi-dot marking
+
+Display multiple colored dots below a date, ideal for showing multiple events or categories on the same day.
+
+```tsx
+<Calendar
+  markingType="multi-dot"
+  markedDates={{
+    '2024-03-15': {
+      selected: true,
+      dots: [
+        { key: 'vacation', color: 'blue', selectedDotColor: 'red' },
+        { key: 'massage', color: 'red', selectedDotColor: 'white' }
+      ]
+    },
+    '2024-03-16': {
+      disabled: true,
+      dots: [
+        { key: 'vacation', color: 'green', selectedDotColor: 'red' },
+        { key: 'massage', color: 'red', selectedDotColor: 'green' }
+      ]
+    }
+  }}
+/>
+```
+
+### Multi-dot properties
+
+<ParamField path="dots" type="array">
+  Array of dot objects to display
+  
+  ```typescript
+  type DOT = {
+    key?: string;
+    color: string;
+    selectedDotColor?: string;
+  };
+  ```
+</ParamField>
+
+<Note>
+  The `key` property is optional but recommended for React's reconciliation. Each dot must have a `color` property.
+</Note>
+
+## Period marking
+
+Highlight date ranges with colored backgrounds. Perfect for showing date ranges like reservations, events, or availability.
+
+```tsx
+<Calendar
+  markingType="period"
+  markedDates={{
+    '2024-03-12': { startingDay: true, color: 'green', endingDay: true },
+    '2024-03-22': { startingDay: true, color: 'green' },
+    '2024-03-23': { endingDay: true, color: 'gray' },
+    '2024-03-25': { startingDay: true, color: 'gray' },
+    '2024-03-26': { color: 'gray' },
+    '2024-03-27': { endingDay: true, color: 'gray' }
+  }}
+/>
+```
+
+### Period properties
+
+<ParamField path="color" type="string" required>
+  Background color for the period
+</ParamField>
+
+<ParamField path="startingDay" type="boolean">
+  Whether this date starts a period (adds rounded left edge)
+</ParamField>
+
+<ParamField path="endingDay" type="boolean">
+  Whether this date ends a period (adds rounded right edge)
+</ParamField>
+
+<ParamField path="textColor" type="string">
+  Custom text color for dates in the period
+</ParamField>
+
+### Combining period with dots
+
+You can combine period marking with dot markers:
+
+```tsx
+<Calendar
+  markingType="period"
+  markedDates={{
+    '2024-03-15': { marked: true, dotColor: '#50cebb' },
+    '2024-03-16': { startingDay: true, color: '#50cebb', textColor: 'white' },
+    '2024-03-17': {
+      color: '#70d7c7',
+      customTextStyle: {
+        color: '#FFFAAA',
+        fontWeight: '700'
+      }
+    },
+    '2024-03-18': { color: '#70d7c7', textColor: 'white', marked: true, dotColor: 'white' },
+    '2024-03-19': {
+      endingDay: true,
+      color: '#50cebb',
+      textColor: 'white',
+      customContainerStyle: {
+        borderTopRightRadius: 5,
+        borderBottomRightRadius: 5,
+        backgroundColor: 'green'
+      }
+    }
+  }}
+/>
+```
+
+## Multi-period marking
+
+Display multiple overlapping period ranges on the same dates. Each period is rendered as a separate horizontal bar.
+
+```tsx
+<Calendar
+  markingType="multi-period"
+  markedDates={{
+    '2024-03-15': {
+      periods: [
+        { startingDay: true, endingDay: false, color: 'green' },
+        { startingDay: true, endingDay: false, color: 'orange' }
+      ]
+    },
+    '2024-03-16': {
+      periods: [
+        { startingDay: false, endingDay: true, color: 'green' },
+        { startingDay: false, endingDay: true, color: 'orange' },
+        { startingDay: true, endingDay: false, color: 'pink' }
+      ]
+    },
+    '2024-03-18': {
+      periods: [
+        { startingDay: true, endingDay: true, color: 'orange' },
+        { color: 'transparent' },
+        { startingDay: false, endingDay: false, color: 'pink' }
+      ]
+    }
+  }}
+/>
+```
+
+### Multi-period properties
+
+<ParamField path="periods" type="array" required>
+  Array of period objects to display
+  
+  ```typescript
+  type PERIOD = {
+    color: string;
+    startingDay?: boolean;
+    endingDay?: boolean;
+  };
+  ```
+</ParamField>
+
+<Info>
+  Use `color: 'transparent'` to create spacing between periods when you need alignment across multiple dates.
+</Info>
+
+## Custom marking
+
+Create completely custom date styles with full control over container and text styling.
+
+```tsx
+<Calendar
+  markingType="custom"
+  markedDates={{
+    '2024-03-15': {
+      customStyles: {
+        container: {
+          backgroundColor: 'white',
+          elevation: 2
+        },
+        text: {
+          color: 'red',
+          marginTop: 0
+        }
+      }
+    },
+    '2024-03-16': {
+      selected: true
+    },
+    '2024-03-17': {
+      customStyles: {
+        container: {
+          backgroundColor: 'red',
+          elevation: 4
+        },
+        text: {
+          color: 'white'
+        }
+      }
+    },
+    '2024-03-21': {
+      customStyles: {
+        container: {
+          backgroundColor: 'pink',
+          elevation: 4,
+          borderColor: 'purple',
+          borderWidth: 2
+        },
+        text: {
+          color: 'purple',
+          fontWeight: 'bold'
+        }
+      }
+    }
+  }}
+/>
+```
+
+### Custom marking properties
+
+<ParamField path="customStyles" type="object">
+  Custom styles for the date
+  
+  ```typescript
+  type CustomStyle = {
+    container?: ViewStyle;
+    text?: TextStyle;
+  };
+  ```
+</ParamField>
+
+<Note>
+  Custom marking automatically applies `borderRadius: 16` to containers unless you specify a different value.
+</Note>
+
+## Common marking properties
+
+These properties work across all marking types:
+
+<ParamField path="selected" type="boolean">
+  Whether the date is selected
+</ParamField>
+
+<ParamField path="disabled" type="boolean">
+  Whether the date is disabled (grayed out)
+</ParamField>
+
+<ParamField path="inactive" type="boolean">
+  Whether the date is inactive (dimmed)
+</ParamField>
+
+<ParamField path="disableTouchEvent" type="boolean">
+  Disable touch events for this date
+</ParamField>
+
+<ParamField path="activeOpacity" type="number">
+  Touch opacity when pressing the date
+</ParamField>
+
+<ParamField path="selectedColor" type="string">
+  Custom background color for selected state
+</ParamField>
+
+<ParamField path="selectedTextColor" type="string">
+  Custom text color for selected state
+</ParamField>
+
+<ParamField path="textColor" type="string">
+  Custom text color for the date
+</ParamField>
+
+<ParamField path="customTextStyle" type="TextStyle">
+  Custom text style object
+</ParamField>
+
+<ParamField path="customContainerStyle" type="ViewStyle">
+  Custom container style object
+</ParamField>
+
+<ParamField path="accessibilityLabel" type="string">
+  Custom accessibility label for screen readers
+</ParamField>
+
+## Type definitions
+
+The complete marking interface from the source code:
+
+```typescript
+export interface MarkingProps extends DotProps {
+  type?: MarkingTypes;
+  theme?: Theme;
+  selected?: boolean;
+  marked?: boolean;
+  today?: boolean;
+  disabled?: boolean;
+  inactive?: boolean;
+  disableTouchEvent?: boolean;
+  activeOpacity?: number;
+  textColor?: string;
+  selectedColor?: string;
+  selectedTextColor?: string;
+  customTextStyle?: StyleProp<TextStyle>;
+  customContainerStyle?: StyleProp<ViewStyle>;
+  dotColor?: string;
+  // multi-dot
+  dots?: DOT[];
+  // multi-period
+  periods?: PERIOD[];
+  startingDay?: boolean;
+  endingDay?: boolean;
+  accessibilityLabel?: string;
+  customStyles?: CustomStyle;
+}
+```
+
+## Best practices
+
+<Accordion title="Choose the right marking type">
+  - **Dot**: Single events or simple indicators
+  - **Multi-dot**: Multiple events on the same day
+  - **Period**: Date ranges like bookings or availability
+  - **Multi-period**: Overlapping ranges or multiple categories
+  - **Custom**: Complete visual control for unique designs
+</Accordion>
+
+<Accordion title="Performance considerations">
+  Marking types are rendered in this order (from most to least performant):
+  1. Dot (simplest rendering)
+  2. Multi-dot
+  3. Period
+  4. Custom
+  5. Multi-period (most complex rendering)
+  
+  For calendars with many marked dates, prefer simpler marking types.
+</Accordion>
+
+<Accordion title="Accessibility">
+  Always provide `accessibilityLabel` for dates with special meaning to improve screen reader support:
+  
+  ```tsx
+  markedDates={{
+    '2024-03-15': {
+      marked: true,
+      accessibilityLabel: 'Team meeting at 3 PM'
+    }
+  }}
+  ```
+</Accordion>
+
+<Warning>
+  Period marking uses `TouchableWithoutFeedback` instead of `TouchableOpacity` for proper background rendering. This means you cannot use `activeOpacity` with period marking types.
+</Warning>

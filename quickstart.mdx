@@ -1,80 +1,266 @@
 ---
 title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+description: "Get started with React Native Calendars in minutes"
 ---
 
-## Get started in three steps
+Get your first calendar up and running in your React Native app in just a few minutes.
 
-Get your documentation site running locally and make your first customization.
+## Installation
 
-### Step 1: Set up your local environment
+<Steps>
+  <Step title="Install the package">
+    Install `react-native-calendars` using your preferred package manager:
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+    ```bash
+    npm install react-native-calendars
+    ```
 
-### Step 2: Deploy your changes
+    or
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    ```bash
+    yarn add react-native-calendars
+    ```
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+    <Note>
+      React Native Calendars is implemented in pure JavaScript, so no native module linking is required.
+    </Note>
+  </Step>
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+  <Step title="Import the Calendar component">
+    Import the Calendar component into your React Native app:
 
-### Step 3: Go live
+    ```javascript
+    import React, { useState } from 'react';
+    import { Calendar } from 'react-native-calendars';
+    ```
+  </Step>
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+  <Step title="Add a basic calendar">
+    Here's a simple example to get you started:
 
-## Next steps
+    ```javascript
+    import React, { useState } from 'react';
+    import { View, StyleSheet } from 'react-native';
+    import { Calendar } from 'react-native-calendars';
 
-Now that you have your docs running, explore these key features:
+    const App = () => {
+      const [selected, setSelected] = useState('');
+
+      return (
+        <View style={styles.container}>
+          <Calendar
+            onDayPress={day => {
+              setSelected(day.dateString);
+            }}
+            markedDates={{
+              [selected]: {
+                selected: true,
+                disableTouchEvent: true,
+                selectedColor: 'orange'
+              }
+            }}
+          />
+        </View>
+      );
+    };
+
+    const styles = StyleSheet.create({
+      container: {
+        flex: 1,
+        padding: 20
+      }
+    });
+
+    export default App;
+    ```
+
+    This creates a basic calendar where users can select dates, and the selected date is highlighted in orange.
+  </Step>
+
+  <Step title="Enable swipe gestures (optional)">
+    Add swipe functionality to navigate between months:
+
+    ```javascript
+    <Calendar
+      enableSwipeMonths
+      onDayPress={day => {
+        setSelected(day.dateString);
+      }}
+      markedDates={{
+        [selected]: {
+          selected: true,
+          selectedColor: 'orange'
+        }
+      }}
+    />
+    ```
+  </Step>
+</Steps>
+
+## Complete Working Example
+
+Here's a complete, copy-paste ready example with common features:
+
+```javascript
+import React, { useState } from 'react';
+import { View, StyleSheet, Text } from 'react-native';
+import { Calendar } from 'react-native-calendars';
+
+const App = () => {
+  const [selected, setSelected] = useState('');
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>My Calendar App</Text>
+      
+      <Calendar
+        // Enable month switching by swiping
+        enableSwipeMonths
+        
+        // Handler for day press
+        onDayPress={day => {
+          setSelected(day.dateString);
+          console.log('selected day', day);
+        }}
+        
+        // Mark selected date and other dates
+        markedDates={{
+          [selected]: {
+            selected: true,
+            disableTouchEvent: true,
+            selectedColor: 'orange',
+            selectedTextColor: 'white'
+          },
+          '2024-03-15': {
+            marked: true,
+            dotColor: 'red'
+          },
+          '2024-03-16': {
+            marked: true,
+            dotColor: 'blue'
+          }
+        }}
+        
+        // Customize the calendar appearance
+        style={styles.calendar}
+        theme={{
+          selectedDayBackgroundColor: 'orange',
+          selectedDayTextColor: 'white',
+          todayTextColor: 'orange',
+          arrowColor: 'orange'
+        }}
+      />
+      
+      {selected ? (
+        <Text style={styles.selectedDate}>
+          Selected: {selected}
+        </Text>
+      ) : null}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff'
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center'
+  },
+  calendar: {
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 8
+  },
+  selectedDate: {
+    marginTop: 20,
+    fontSize: 16,
+    textAlign: 'center',
+    color: '#333'
+  }
+});
+
+export default App;
+```
+
+## Next Steps
+
+Now that you have a basic calendar working, explore more features:
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Calendar Component" icon="calendar" href="/api/calendar">
+    Learn about all Calendar props and customization options
+  </Card>
+  <Card title="Date Marking" icon="circle-dot" href="/concepts/date-marking">
+    Add dots, periods, and custom markings to dates
+  </Card>
+  <Card title="Theming" icon="palette" href="/concepts/theming">
+    Customize colors, fonts, and styles
+  </Card>
+  <Card title="Advanced Examples" icon="code" href="/examples/basic-calendar">
+    See more complex implementations and patterns
+  </Card>
 </CardGroup>
 
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
+## Common Use Cases
+
+<AccordionGroup>
+  <Accordion title="Marking multiple dates with dots">
+    ```javascript
+    <Calendar
+      markedDates={{
+        '2024-03-10': { marked: true, dotColor: 'red' },
+        '2024-03-11': { marked: true, dotColor: 'blue' },
+        '2024-03-12': { marked: true, dotColor: 'green' }
+      }}
+    />
+    ```
+  </Accordion>
+
+  <Accordion title="Setting min and max dates">
+    ```javascript
+    <Calendar
+      minDate={'2024-01-01'}
+      maxDate={'2024-12-31'}
+      disableAllTouchEventsForDisabledDays
+    />
+    ```
+  </Accordion>
+
+  <Accordion title="Hiding extra days from other months">
+    ```javascript
+    <Calendar
+      hideExtraDays
+      firstDay={1} // Monday as first day
+    />
+    ```
+  </Accordion>
+
+  <Accordion title="Responding to month changes">
+    ```javascript
+    <Calendar
+      onMonthChange={month => {
+        console.log('month changed', month);
+      }}
+    />
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<Warning>
+  If you encounter any issues during installation or setup, make sure:
+  - You're using React Native 0.60 or higher
+  - Your project's dependencies are properly installed
+  - You've restarted your Metro bundler after installing
+</Warning>
+
+<Tip>
+  The calendar component is highly customizable. Check out the [Calendar Component documentation](/api/calendar) for a complete list of props and examples.
+</Tip>

@@ -1,0 +1,275 @@
+---
+title: CalendarProvider
+description: Context provider component for managing calendar state and date selection across multiple calendar components
+---
+
+The `CalendarProvider` component wraps your calendar components and provides shared state management through React Context. It handles date selection, month changes, and coordinates updates between multiple calendar components like ExpandableCalendar, WeekCalendar, and AgendaList.
+
+## Import
+
+```jsx
+import { CalendarProvider } from 'react-native-calendars';
+```
+
+## Basic usage
+
+```jsx
+import React from 'react';
+import { CalendarProvider, ExpandableCalendar, AgendaList } from 'react-native-calendars';
+
+const MyCalendar = () => {
+  return (
+    <CalendarProvider date="2024-03-15">
+      <ExpandableCalendar />
+      <AgendaList />
+    </CalendarProvider>
+  );
+};
+```
+
+## Props
+
+<ParamField path="date" type="string" required>
+  Initial date in 'yyyy-MM-dd' format. This is the starting date for the calendar.
+  
+  ```jsx
+  <CalendarProvider date="2024-03-15">
+  ```
+</ParamField>
+
+<ParamField path="onDateChanged" type="(date: string, updateSource: UpdateSources) => void">
+  Callback fired when the selected date changes. Receives the new date string and the source of the update.
+  
+  ```jsx
+  <CalendarProvider
+    date="2024-03-15"
+    onDateChanged={(date, source) => {
+      console.log('Date changed to:', date);
+      console.log('Update source:', source);
+    }}
+  >
+  ```
+</ParamField>
+
+<ParamField path="onMonthChange" type="(date: DateData, updateSource: UpdateSources) => void">
+  Callback fired when the visible month changes. Receives date data object and the source of the update.
+  
+  ```jsx
+  <CalendarProvider
+    date="2024-03-15"
+    onMonthChange={(dateData, source) => {
+      console.log('Month changed to:', dateData.month, dateData.year);
+    }}
+  >
+  ```
+</ParamField>
+
+<ParamField path="theme" type="Theme">
+  Theme object to override specific styles for calendar components. See the [Theme documentation](/api/types#theme) for all available options.
+  
+  ```jsx
+  <CalendarProvider
+    date="2024-03-15"
+    theme={{
+      todayButtonTextColor: '#4A90E2',
+      selectedDayBackgroundColor: '#4A90E2',
+      dotColor: '#4A90E2',
+    }}
+  >
+  ```
+</ParamField>
+
+<ParamField path="style" type="StyleProp<ViewStyle>">
+  Custom style for the calendar container element.
+  
+  ```jsx
+  <CalendarProvider
+    date="2024-03-15"
+    style={{ backgroundColor: '#f5f5f5' }}
+  >
+  ```
+</ParamField>
+
+<ParamField path="disableAutoDaySelection" type="CalendarNavigationTypes[]">
+  Array of navigation types for which to disable automatic day selection. This allows users to scroll through months without changing the selected date.
+  
+  Available options:
+  - `'listDrag'` - When scrolling the agenda list
+  - `'pageScroll'` - When scrolling between months
+  - `'weekScroll'` - When scrolling between weeks
+  - `'arrowPress'` - When pressing month arrows
+  - `'weekArrowPress'` - When pressing week arrows
+  - `'todayPress'` - When pressing the today button
+  
+  ```jsx
+  <CalendarProvider
+    date="2024-03-15"
+    disableAutoDaySelection={['listDrag', 'pageScroll']}
+  >
+  ```
+</ParamField>
+
+<ParamField path="showTodayButton" type="boolean" default="false">
+  Whether to show the floating "Today" button that jumps to the current date.
+  
+  ```jsx
+  <CalendarProvider date="2024-03-15" showTodayButton>
+  ```
+</ParamField>
+
+<ParamField path="todayBottomMargin" type="number">
+  Bottom margin for the today button positioning in pixels.
+  
+  ```jsx
+  <CalendarProvider
+    date="2024-03-15"
+    showTodayButton
+    todayBottomMargin={20}
+  >
+  ```
+</ParamField>
+
+<ParamField path="todayButtonStyle" type="ViewStyle">
+  Custom style object for the today button.
+  
+  ```jsx
+  <CalendarProvider
+    date="2024-03-15"
+    showTodayButton
+    todayButtonStyle={{
+      backgroundColor: '#4A90E2',
+      borderRadius: 20,
+    }}
+  >
+  ```
+</ParamField>
+
+<ParamField path="disabledOpacity" type="number">
+  Opacity value (0-1) for the today button when it's disabled (already showing today).
+  
+  ```jsx
+  <CalendarProvider
+    date="2024-03-15"
+    showTodayButton
+    disabledOpacity={0.3}
+  >
+  ```
+</ParamField>
+
+<ParamField path="numberOfDays" type="number">
+  Number of days to display in timeline calendar mode. Used with Timeline and WeekCalendar components.
+  
+  ```jsx
+  <CalendarProvider date="2024-03-15" numberOfDays={7}>
+    <WeekCalendar />
+    <Timeline />
+  </CalendarProvider>
+  ```
+</ParamField>
+
+<ParamField path="timelineLeftInset" type="number" default="72">
+  Left inset width for the timeline calendar (sidebar width) in pixels.
+  
+  ```jsx
+  <CalendarProvider
+    date="2024-03-15"
+    numberOfDays={7}
+    timelineLeftInset={80}
+  >
+  ```
+</ParamField>
+
+## Update sources
+
+The `onDateChanged` and `onMonthChange` callbacks receive an `updateSource` parameter that indicates what triggered the update:
+
+<ResponseField name="CALENDAR_INIT" type="string" value="'calendarInit'">
+  Initial calendar setup
+</ResponseField>
+
+<ResponseField name="PROP_UPDATE" type="string" value="'propUpdate'">
+  Date prop changed from parent
+</ResponseField>
+
+<ResponseField name="TODAY_PRESS" type="string" value="'todayPress'">
+  Today button was pressed
+</ResponseField>
+
+<ResponseField name="DAY_PRESS" type="string" value="'dayPress'">
+  A day was pressed in the calendar
+</ResponseField>
+
+<ResponseField name="ARROW_PRESS" type="string" value="'arrowPress'">
+  Month arrow was pressed
+</ResponseField>
+
+<ResponseField name="WEEK_ARROW_PRESS" type="string" value="'weekArrowPress'">
+  Week arrow was pressed
+</ResponseField>
+
+<ResponseField name="LIST_DRAG" type="string" value="'listDrag'">
+  Agenda list was scrolled
+</ResponseField>
+
+<ResponseField name="PAGE_SCROLL" type="string" value="'pageScroll'">
+  Calendar month was scrolled
+</ResponseField>
+
+<ResponseField name="WEEK_SCROLL" type="string" value="'weekScroll'">
+  Week calendar was scrolled
+</ResponseField>
+
+## Advanced example
+
+```jsx
+import React, { useState } from 'react';
+import {
+  CalendarProvider,
+  ExpandableCalendar,
+  AgendaList,
+} from 'react-native-calendars';
+
+const AdvancedCalendar = () => {
+  const [currentDate, setCurrentDate] = useState('2024-03-15');
+
+  const handleDateChange = (date, source) => {
+    console.log('Date changed:', date, 'from', source);
+    setCurrentDate(date);
+  };
+
+  const handleMonthChange = (dateData, source) => {
+    console.log('Month changed:', dateData.month, dateData.year);
+  };
+
+  return (
+    <CalendarProvider
+      date={currentDate}
+      onDateChanged={handleDateChange}
+      onMonthChange={handleMonthChange}
+      showTodayButton
+      disableAutoDaySelection={['listDrag']}
+      theme={{
+        todayButtonTextColor: '#4A90E2',
+        selectedDayBackgroundColor: '#4A90E2',
+      }}
+    >
+      <ExpandableCalendar
+        firstDay={1}
+        markedDates={{
+          [currentDate]: { selected: true },
+        }}
+      />
+      <AgendaList
+        sections={/* your agenda data */}
+      />
+    </CalendarProvider>
+  );
+};
+```
+
+## Related
+
+- [CalendarContext](/api/calendar-context) - Access context values in child components
+- [ExpandableCalendar](/api/expandable-calendar) - Expandable calendar component
+- [WeekCalendar](/api/week-calendar) - Week view calendar
+- [Timeline](/api/timeline) - Timeline view for events

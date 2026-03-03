@@ -1,0 +1,297 @@
+---
+title: Calendar
+description: The base calendar component for displaying a single month view with date selection and marking capabilities
+---
+
+The Calendar component displays a single month with full customization options for marking dates, handling date selection, and styling.
+
+## Basic usage
+
+```jsx
+import { Calendar } from 'react-native-calendars';
+
+<Calendar
+  onDayPress={(day) => console.log('selected day', day)}
+  markedDates={{
+    '2023-05-16': {selected: true, marked: true}
+  }}
+/>
+```
+
+## Props
+
+The Calendar component extends both CalendarHeader and Day component props.
+
+### Date configuration
+
+<ParamField path="current" type="string">
+  Initially visible month in YYYY-MM-DD format. This prop is being deprecated - use `initialDate` instead.
+</ParamField>
+
+<ParamField path="initialDate" type="string">
+  Initially visible month in YYYY-MM-DD format. If changed, will reinitialize the calendar to this value.
+</ParamField>
+
+<ParamField path="minDate" type="string">
+  Minimum date that can be selected in YYYY-MM-DD format. Dates before minDate will be grayed out.
+</ParamField>
+
+<ParamField path="maxDate" type="string">
+  Maximum date that can be selected in YYYY-MM-DD format. Dates after maxDate will be grayed out.
+</ParamField>
+
+<ParamField path="allowSelectionOutOfRange" type="boolean">
+  Allow selection of dates before minDate or after maxDate. Default is `false`.
+</ParamField>
+
+### Marking and styling
+
+<ParamField path="markedDates" type="MarkedDates">
+  Collection of dates that have to be marked. Object with date strings as keys and marking objects as values.
+  
+  ```typescript
+  {
+    '2023-05-16': {
+      selected: true,
+      marked: true,
+      selectedColor: 'blue'
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="theme" type="Theme">
+  Specify theme properties to override specific styles for calendar parts.
+  
+  ```typescript
+  {
+    backgroundColor: '#ffffff',
+    calendarBackground: '#ffffff',
+    textSectionTitleColor: '#b6c1cd',
+    selectedDayBackgroundColor: '#00adf5',
+    selectedDayTextColor: '#ffffff',
+    todayTextColor: '#00adf5',
+    dayTextColor: '#2d4150'
+  }
+  ```
+</ParamField>
+
+<ParamField path="style" type="ViewStyle">
+  Specify style for calendar container element.
+</ParamField>
+
+<ParamField path="headerStyle" type="ViewStyle">
+  Style passed to the header.
+</ParamField>
+
+### Display options
+
+<ParamField path="hideExtraDays" type="boolean">
+  Do not show days of other months in month page. Default is `false`.
+</ParamField>
+
+<ParamField path="showSixWeeks" type="boolean">
+  Always show six weeks on each month (only when hideExtraDays = false). Default is `false`.
+</ParamField>
+
+<ParamField path="firstDay" type="number">
+  If `0`, week starts from Sunday. If `1`, week starts from Monday. Default is `0`.
+</ParamField>
+
+<ParamField path="showWeekNumbers" type="boolean">
+  Show week numbers on the left side of the calendar. Default is `false`.
+</ParamField>
+
+<ParamField path="hideDayNames" type="boolean">
+  Hide day names (Mon, Tue, etc.) at the top of the calendar. Default is `false`.
+</ParamField>
+
+<ParamField path="displayLoadingIndicator" type="boolean">
+  Display loading indicator when calendar data is being loaded. Default is `false`.
+</ParamField>
+
+### Event handlers
+
+<ParamField path="onDayPress" type="(date: DateData) => void">
+  Handler which gets executed on day press.
+  
+  ```typescript
+  onDayPress={(day) => {
+    console.log('selected day', day);
+    // day: { year, month, day, timestamp, dateString }
+  }}
+  ```
+</ParamField>
+
+<ParamField path="onDayLongPress" type="(date: DateData) => void">
+  Handler which gets executed on day long press.
+</ParamField>
+
+<ParamField path="onMonthChange" type="(date: DateData) => void">
+  Handler which gets executed when month changes in calendar.
+</ParamField>
+
+<ParamField path="onVisibleMonthsChange" type="(months: DateData[]) => void">
+  Handler which gets executed when visible month changes in calendar.
+</ParamField>
+
+### Navigation
+
+<ParamField path="disableMonthChange" type="boolean">
+  Disables changing month when clicking on days of other months (when hideExtraDays = false). Default is `false`.
+</ParamField>
+
+<ParamField path="enableSwipeMonths" type="boolean">
+  Enable the option to swipe between months. Default is `false`.
+</ParamField>
+
+<ParamField path="hideArrows" type="boolean">
+  Hide month navigation arrows. Default is `false`.
+</ParamField>
+
+<ParamField path="disableArrowLeft" type="boolean">
+  Disable left arrow. Default is `false`.
+</ParamField>
+
+<ParamField path="disableArrowRight" type="boolean">
+  Disable right arrow. Default is `false`.
+</ParamField>
+
+<ParamField path="renderArrow" type="(direction: 'left' | 'right') => ReactNode">
+  Replace default arrows with custom ones.
+  
+  ```jsx
+  renderArrow={(direction) => (
+    <Text>{direction === 'left' ? '<' : '>'}</Text>
+  )}
+  ```
+</ParamField>
+
+<ParamField path="onPressArrowLeft" type="(method: () => void, month?: XDate) => void">
+  Handler which gets executed when press arrow icon left. It receives a callback to go back a month.
+</ParamField>
+
+<ParamField path="onPressArrowRight" type="(method: () => void, month?: XDate) => void">
+  Handler which gets executed when press arrow icon right. It receives a callback to go forward a month.
+</ParamField>
+
+### Customization
+
+<ParamField path="customHeader" type="any">
+  Allow rendering a totally custom header.
+  
+  ```jsx
+  customHeader={(props) => <CustomHeader {...props} />}
+  ```
+</ParamField>
+
+<ParamField path="dayComponent" type="React.ComponentType<DayProps>">
+  Provide custom day rendering component.
+</ParamField>
+
+<ParamField path="monthFormat" type="string">
+  Month format in the header. Default is `'MMMM yyyy'`. Formatting values: http://arshaw.com/xdate/#Formatting
+</ParamField>
+
+### Disabled dates
+
+<ParamField path="disabledByDefault" type="boolean">
+  Disable all days by default. Default is `false`.
+</ParamField>
+
+<ParamField path="disabledByWeekDays" type="number[]">
+  Disable specific days of the week (0 = Sunday, 6 = Saturday).
+  
+  ```jsx
+  disabledByWeekDays={[0, 6]} // Disable weekends
+  ```
+</ParamField>
+
+<ParamField path="disabledDaysIndexes" type="number[]">
+  Apply custom disable color to selected day name indexes.
+</ParamField>
+
+### Accessibility
+
+<ParamField path="accessibilityElementsHidden" type="boolean">
+  Whether the accessibility elements contained within this accessibility element are hidden (iOS only).
+</ParamField>
+
+<ParamField path="importantForAccessibility" type="'auto' | 'yes' | 'no' | 'no-hide-descendants'">
+  Controls if a view fires accessibility events and if it is reported to accessibility services (Android only).
+</ParamField>
+
+<ParamField path="testID" type="string">
+  Test identifier for automated testing.
+</ParamField>
+
+## Examples
+
+### Basic calendar with marked dates
+
+```jsx
+<Calendar
+  markedDates={{
+    '2023-05-16': {selected: true, marked: true, selectedColor: 'blue'},
+    '2023-05-17': {marked: true},
+    '2023-05-18': {marked: true, dotColor: 'red', activeOpacity: 0}
+  }}
+/>
+```
+
+### Calendar with custom theme
+
+```jsx
+<Calendar
+  theme={{
+    backgroundColor: '#ffffff',
+    calendarBackground: '#ffffff',
+    textSectionTitleColor: '#b6c1cd',
+    selectedDayBackgroundColor: '#00adf5',
+    selectedDayTextColor: '#ffffff',
+    todayTextColor: '#00adf5',
+    dayTextColor: '#2d4150',
+    textDisabledColor: '#d9e1e8',
+    dotColor: '#00adf5',
+    selectedDotColor: '#ffffff',
+    arrowColor: 'orange',
+    monthTextColor: 'blue',
+    textDayFontFamily: 'monospace',
+    textMonthFontFamily: 'monospace',
+    textDayHeaderFontFamily: 'monospace',
+    textDayFontSize: 16,
+    textMonthFontSize: 16,
+    textDayHeaderFontSize: 16
+  }}
+/>
+```
+
+### Calendar with date range selection
+
+```jsx
+import { Calendar } from 'react-native-calendars';
+import { useState } from 'react';
+
+function DateRangeCalendar() {
+  const [selected, setSelected] = useState('');
+
+  return (
+    <Calendar
+      onDayPress={(day) => setSelected(day.dateString)}
+      markedDates={{
+        [selected]: {
+          selected: true,
+          disableTouchEvent: true,
+          selectedColor: 'orange',
+          selectedTextColor: 'red'
+        }
+      }}
+    />
+  );
+}
+```
+
+## Related components
+
+- [CalendarList](/api/calendar-list) - Horizontal or vertical scrollable calendar
+- [Agenda](/api/agenda) - Calendar with agenda/reservation list

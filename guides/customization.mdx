@@ -1,0 +1,357 @@
+---
+title: Customization
+description: Learn how to customize the appearance and styling of React Native Calendars
+---
+
+## Overview
+
+React Native Calendars provides extensive customization options through the `theme` prop, custom styling, and component overrides. You can customize colors, fonts, sizes, and even replace default components with your own.
+
+## Theme customization
+
+The `theme` prop allows you to customize colors, fonts, and other visual properties without writing custom stylesheets.
+
+### Basic theme example
+
+```jsx
+import {Calendar} from 'react-native-calendars';
+
+<Calendar
+  theme={{
+    backgroundColor: '#ffffff',
+    calendarBackground: '#ffffff',
+    textSectionTitleColor: '#b6c1cd',
+    selectedDayBackgroundColor: '#00adf5',
+    selectedDayTextColor: '#ffffff',
+    todayTextColor: '#00adf5',
+    dayTextColor: '#2d4150',
+    textDisabledColor: '#dd99ee'
+  }}
+/>
+```
+
+### Dark theme example
+
+Create a dark themed calendar by customizing the color scheme:
+
+```jsx
+<Calendar
+  theme={{
+    calendarBackground: '#333248',
+    textSectionTitleColor: 'white',
+    textSectionTitleDisabledColor: 'pink',
+    dayTextColor: 'red',
+    todayTextColor: 'white',
+    selectedDayTextColor: 'white',
+    monthTextColor: 'white',
+    indicatorColor: 'white',
+    selectedDayBackgroundColor: '#333248',
+    arrowColor: 'white'
+  }}
+/>
+```
+
+## Available theme properties
+
+<Note>
+All theme properties are optional. Only include the properties you want to customize.
+</Note>
+
+### Color properties
+
+| Property | Description |
+|----------|-------------|
+| `backgroundColor` | Background color of the calendar container |
+| `calendarBackground` | Background color of the calendar |
+| `textSectionTitleColor` | Color of the day names row (Mon, Tue, etc) |
+| `textSectionTitleDisabledColor` | Color of disabled section titles |
+| `dayTextColor` | Default text color for days |
+| `todayTextColor` | Text color for today's date |
+| `selectedDayTextColor` | Text color for selected day |
+| `monthTextColor` | Color of the month title |
+| `selectedDayBackgroundColor` | Background color for selected day |
+| `arrowColor` | Color of the navigation arrows |
+| `disabledArrowColor` | Color of disabled arrows |
+| `textDisabledColor` | Text color for disabled days |
+| `textInactiveColor` | Text color for inactive days |
+| `dotColor` | Default color for marking dots |
+| `selectedDotColor` | Dot color when day is selected |
+| `todayBackgroundColor` | Background color for today |
+| `todayDotColor` | Dot color for today |
+| `disabledDotColor` | Dot color for disabled days |
+| `inactiveDotColor` | Dot color for inactive days |
+
+### Font properties
+
+```jsx
+<Calendar
+  theme={{
+    textDayFontFamily: 'System',
+    textMonthFontFamily: 'System',
+    textDayHeaderFontFamily: 'System',
+    textDayFontWeight: '300',
+    textMonthFontWeight: 'bold',
+    textDayHeaderFontWeight: '300',
+    textDayFontSize: 16,
+    textMonthFontSize: 16,
+    textDayHeaderFontSize: 13
+  }}
+/>
+```
+
+### Arrow customization
+
+```jsx
+<Calendar
+  theme={{
+    arrowColor: 'orange',
+    arrowHeight: 20,
+    arrowWidth: 15,
+    arrowStyle: {padding: 0}
+  }}
+/>
+```
+
+## Advanced stylesheet customization
+
+For more control, use the `stylesheet` property within the theme to override specific internal styles:
+
+```jsx
+<Calendar
+  theme={{
+    stylesheet: {
+      calendar: {
+        header: {
+          week: {
+            marginTop: 30,
+            marginHorizontal: 12,
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+          }
+        }
+      }
+    }
+  }}
+/>
+```
+
+## Container style
+
+Use the `style` prop to customize the calendar container:
+
+```jsx
+<Calendar
+  style={{
+    borderWidth: 1,
+    borderColor: 'gray',
+    height: 350,
+    borderRadius: 10
+  }}
+/>
+```
+
+## Custom day component
+
+Replace the default day rendering with your own component:
+
+```jsx
+<Calendar
+  dayComponent={({date, state}) => {
+    return (
+      <View>
+        <Text
+          style={[
+            {textAlign: 'center'},
+            state === 'disabled' ? {color: 'grey'} : {color: 'purple'}
+          ]}
+        >
+          {date?.day}
+        </Text>
+      </View>
+    );
+  }}
+/>
+```
+
+<Tip>
+The `state` parameter can be 'selected', 'disabled', 'inactive', 'today', or '' (empty string).
+</Tip>
+
+## Custom header
+
+Replace the entire calendar header with your custom component:
+
+<Steps>
+  <Step title="Create custom header component">
+    ```jsx
+    const CustomHeader = React.forwardRef((props, ref) => {
+      return (
+        <View ref={ref} {...props} style={styles.customHeader}>
+          <TouchableOpacity onPress={() => props.addMonth(-1)}>
+            <Text>Previous</Text>
+          </TouchableOpacity>
+          <Text>Custom Header</Text>
+          <Text>{props.month.toString('MMMM yyyy')}</Text>
+          <TouchableOpacity onPress={() => props.addMonth(1)}>
+            <Text>Next</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    });
+    ```
+  </Step>
+  <Step title="Pass to calendar">
+    ```jsx
+    <Calendar customHeader={CustomHeader} />
+    ```
+  </Step>
+</Steps>
+
+## Custom header title
+
+Customize just the title portion while keeping default arrows:
+
+```jsx
+const CustomHeaderTitle = (
+  <TouchableOpacity onPress={() => console.log('Tapped!')}>
+    <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+      {selectedMonth}-{selectedYear}
+    </Text>
+  </TouchableOpacity>
+);
+
+<Calendar
+  customHeaderTitle={CustomHeaderTitle}
+  onPressArrowLeft={(subtract, month) => {
+    // Custom left arrow behavior
+    subtract();
+  }}
+  onPressArrowRight={(add, month) => {
+    // Custom right arrow behavior
+    add();
+  }}
+/>
+```
+
+## Custom arrow rendering
+
+Customize the arrow components:
+
+```jsx
+<Calendar
+  renderArrow={(direction) => {
+    return direction === 'left' ? (
+      <Text>{'<<'}</Text>
+    ) : (
+      <Text>{'>>'}</Text>
+    );
+  }}
+/>
+```
+
+## Locale customization
+
+Customize month names, day names, and other locale-specific strings:
+
+```jsx
+import {LocaleConfig} from 'react-native-calendars';
+
+LocaleConfig.locales['fr'] = {
+  monthNames: [
+    'Janvier',
+    'Février',
+    'Mars',
+    'Avril',
+    'Mai',
+    'Juin',
+    'Juillet',
+    'Août',
+    'Septembre',
+    'Octobre',
+    'Novembre',
+    'Décembre'
+  ],
+  monthNamesShort: ['Janv.', 'Févr.', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'],
+  dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+  dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
+  today: "Aujourd'hui"
+};
+
+LocaleConfig.defaultLocale = 'fr';
+```
+
+## Header style
+
+Customize the header styling separately:
+
+```jsx
+<Calendar
+  headerStyle={{
+    backgroundColor: '#f0f0f0',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    paddingVertical: 10
+  }}
+/>
+```
+
+## Hiding UI elements
+
+Hide specific calendar elements:
+
+```jsx
+<Calendar
+  hideArrows={true}           // Hide navigation arrows
+  hideExtraDays={true}        // Hide days from other months
+  hideDayNames={true}         // Hide day names row
+  disableArrowLeft={true}     // Disable left arrow
+  disableArrowRight={true}    // Disable right arrow
+/>
+```
+
+<Info>
+Use `hideExtraDays` to create a cleaner look by hiding dates from adjacent months.
+</Info>
+
+## Week numbers
+
+Display week numbers on the left side:
+
+```jsx
+<Calendar
+  showWeekNumbers={true}
+  firstDay={1} // Start week on Monday
+/>
+```
+
+## Accessibility
+
+The calendar supports accessibility features:
+
+```jsx
+<Calendar
+  accessibilityElementsHidden={false}  // iOS
+  importantForAccessibility="yes"      // Android
+/>
+```
+
+## Best practices
+
+<Warning>
+When using custom components, ensure you handle all necessary props and maintain accessibility features.
+</Warning>
+
+<Steps>
+  <Step title="Keep themes consistent">
+    Create a theme object and reuse it across all calendar instances in your app.
+  </Step>
+  <Step title="Test on both platforms">
+    Custom styling may render differently on iOS and Android. Always test both.
+  </Step>
+  <Step title="Consider accessibility">
+    Ensure sufficient color contrast and maintain touch targets of at least 44x44 points.
+  </Step>
+  <Step title="Optimize performance">
+    Use `useMemo` for theme objects and `useCallback` for custom components to prevent unnecessary re-renders.
+  </Step>
+</Steps>

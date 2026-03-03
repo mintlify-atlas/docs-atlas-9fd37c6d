@@ -1,0 +1,439 @@
+---
+title: LocaleConfig
+description: Configure calendar localization including month names, day names, and number formatting
+---
+
+The `LocaleConfig` object is used to configure calendar localization. It's built on XDate's localization system and allows you to customize month names, day names, and other locale-specific settings.
+
+## Import
+
+```jsx
+import { LocaleConfig } from 'react-native-calendars';
+```
+
+<Note>
+  LocaleConfig is a global configuration object. Changes affect all calendar components in your application.
+</Note>
+
+## Basic usage
+
+```jsx
+import { LocaleConfig } from 'react-native-calendars';
+
+// Configure French locale
+LocaleConfig.locales['fr'] = {
+  monthNames: [
+    'Janvier',
+    'Février',
+    'Mars',
+    'Avril',
+    'Mai',
+    'Juin',
+    'Juillet',
+    'Août',
+    'Septembre',
+    'Octobre',
+    'Novembre',
+    'Décembre'
+  ],
+  monthNamesShort: [
+    'Janv.',
+    'Févr.',
+    'Mars',
+    'Avril',
+    'Mai',
+    'Juin',
+    'Juil.',
+    'Août',
+    'Sept.',
+    'Oct.',
+    'Nov.',
+    'Déc.'
+  ],
+  dayNames: [
+    'Dimanche',
+    'Lundi',
+    'Mardi',
+    'Mercredi',
+    'Jeudi',
+    'Vendredi',
+    'Samedi'
+  ],
+  dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
+  today: "Aujourd'hui"
+};
+
+// Set as default locale
+LocaleConfig.defaultLocale = 'fr';
+```
+
+## Configuration
+
+### Setting up a locale
+
+Define locale configurations by adding them to `LocaleConfig.locales`:
+
+```jsx
+LocaleConfig.locales['locale-key'] = {
+  monthNames: [],
+  monthNamesShort: [],
+  dayNames: [],
+  dayNamesShort: [],
+  today: '',
+  formatAccessibilityLabel: '',
+  numbers: []
+};
+```
+
+### Locale properties
+
+<ParamField path="monthNames" type="string[]" required>
+  Array of full month names, starting with January (12 items).
+  
+  ```jsx
+  monthNames: [
+    'January', 'February', 'March', 'April',
+    'May', 'June', 'July', 'August',
+    'September', 'October', 'November', 'December'
+  ]
+  ```
+</ParamField>
+
+<ParamField path="monthNamesShort" type="string[]" required>
+  Array of abbreviated month names, starting with January (12 items).
+  
+  ```jsx
+  monthNamesShort: [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ]
+  ```
+</ParamField>
+
+<ParamField path="dayNames" type="string[]" required>
+  Array of full day names, starting with Sunday (7 items).
+  
+  ```jsx
+  dayNames: [
+    'Sunday', 'Monday', 'Tuesday', 'Wednesday',
+    'Thursday', 'Friday', 'Saturday'
+  ]
+  ```
+</ParamField>
+
+<ParamField path="dayNamesShort" type="string[]" required>
+  Array of abbreviated day names, starting with Sunday (7 items).
+  
+  ```jsx
+  dayNamesShort: ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+  ```
+</ParamField>
+
+<ParamField path="today" type="string">
+  Localized text for "Today" button and label.
+  
+  ```jsx
+  today: 'Today'
+  ```
+</ParamField>
+
+<ParamField path="formatAccessibilityLabel" type="string">
+  Date format string for accessibility labels. Uses XDate format tokens.
+  
+  ```jsx
+  formatAccessibilityLabel: "dddd d 'of' MMMM 'of' yyyy"
+  ```
+  
+  Common tokens:
+  - `dddd` - Full day name
+  - `d` - Day of month
+  - `MMMM` - Full month name
+  - `yyyy` - Full year
+</ParamField>
+
+<ParamField path="numbers" type="string[]">
+  Array of localized number characters (0-9) for number formatting.
+  
+  ```jsx
+  // Arabic-Indic numerals
+  numbers: ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩']
+  ```
+</ParamField>
+
+### Setting default locale
+
+```jsx
+LocaleConfig.defaultLocale = 'locale-key';
+```
+
+## Complete examples
+
+### English locale
+
+```jsx
+import { LocaleConfig } from 'react-native-calendars';
+
+LocaleConfig.locales['en'] = {
+  formatAccessibilityLabel: "dddd d 'of' MMMM 'of' yyyy",
+  monthNames: [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ],
+  monthNamesShort: [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ],
+  dayNames: [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday'
+  ],
+  dayNamesShort: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+  today: 'Today'
+};
+
+LocaleConfig.defaultLocale = 'en';
+```
+
+### Spanish locale
+
+```jsx
+import { LocaleConfig } from 'react-native-calendars';
+
+LocaleConfig.locales['es'] = {
+  monthNames: [
+    'Enero',
+    'Febrero',
+    'Marzo',
+    'Abril',
+    'Mayo',
+    'Junio',
+    'Julio',
+    'Agosto',
+    'Septiembre',
+    'Octubre',
+    'Noviembre',
+    'Diciembre'
+  ],
+  monthNamesShort: [
+    'Ene',
+    'Feb',
+    'Mar',
+    'Abr',
+    'May',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dic'
+  ],
+  dayNames: [
+    'Domingo',
+    'Lunes',
+    'Martes',
+    'Miércoles',
+    'Jueves',
+    'Viernes',
+    'Sábado'
+  ],
+  dayNamesShort: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
+  today: 'Hoy'
+};
+
+LocaleConfig.defaultLocale = 'es';
+```
+
+### Hebrew locale with RTL support
+
+```jsx
+import { LocaleConfig } from 'react-native-calendars';
+
+LocaleConfig.locales['he'] = {
+  formatAccessibilityLabel: "dddd d 'של' MMMM 'של' yyyy",
+  monthNames: [
+    'ינואר',
+    'פברואר',
+    'מרץ',
+    'אפריל',
+    'מאי',
+    'יוני',
+    'יולי',
+    'אוגוסט',
+    'ספטמבר',
+    'אוקטובר',
+    'נובמבר',
+    'דצמבר'
+  ],
+  monthNamesShort: [
+    'ינו',
+    'פבר',
+    'מרץ',
+    'אפר',
+    'מאי',
+    'יונ',
+    'יול',
+    'אוג',
+    'ספט',
+    'אוק',
+    'נוב',
+    'דצמ'
+  ],
+  dayNames: [
+    'ראשון',
+    'שני',
+    'שלישי',
+    'רביעי',
+    'חמישי',
+    'שישי',
+    'שבת'
+  ],
+  dayNamesShort: ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'],
+  today: 'היום'
+};
+
+LocaleConfig.defaultLocale = 'he';
+```
+
+### Arabic locale with number localization
+
+```jsx
+import { LocaleConfig } from 'react-native-calendars';
+
+LocaleConfig.locales['ar'] = {
+  monthNames: [
+    'يناير',
+    'فبراير',
+    'مارس',
+    'أبريل',
+    'مايو',
+    'يونيو',
+    'يوليو',
+    'أغسطس',
+    'سبتمبر',
+    'أكتوبر',
+    'نوفمبر',
+    'ديسمبر'
+  ],
+  monthNamesShort: [
+    'ينا',
+    'فبر',
+    'مار',
+    'أبر',
+    'ماي',
+    'يون',
+    'يول',
+    'أغس',
+    'سبت',
+    'أكت',
+    'نوف',
+    'ديس'
+  ],
+  dayNames: [
+    'الأحد',
+    'الإثنين',
+    'الثلاثاء',
+    'الأربعاء',
+    'الخميس',
+    'الجمعة',
+    'السبت'
+  ],
+  dayNamesShort: ['أحد', 'إثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت'],
+  today: 'اليوم',
+  numbers: ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩']
+};
+
+LocaleConfig.defaultLocale = 'ar';
+```
+
+## Dynamic locale switching
+
+```jsx
+import React, { useState } from 'react';
+import { View, Button } from 'react-native';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
+
+// Configure locales
+LocaleConfig.locales['en'] = {
+  monthNames: ['January', 'February', /* ... */],
+  monthNamesShort: ['Jan', 'Feb', /* ... */],
+  dayNames: ['Sunday', 'Monday', /* ... */],
+  dayNamesShort: ['S', 'M', /* ... */],
+  today: 'Today'
+};
+
+LocaleConfig.locales['es'] = {
+  monthNames: ['Enero', 'Febrero', /* ... */],
+  monthNamesShort: ['Ene', 'Feb', /* ... */],
+  dayNames: ['Domingo', 'Lunes', /* ... */],
+  dayNamesShort: ['D', 'L', /* ... */],
+  today: 'Hoy'
+};
+
+const App = () => {
+  const [locale, setLocale] = useState('en');
+  const [key, setKey] = useState(0);
+
+  const changeLocale = (newLocale) => {
+    LocaleConfig.defaultLocale = newLocale;
+    setLocale(newLocale);
+    // Force calendar re-render
+    setKey(prev => prev + 1);
+  };
+
+  return (
+    <View>
+      <View style={{ flexDirection: 'row', marginBottom: 10 }}>
+        <Button title="English" onPress={() => changeLocale('en')} />
+        <Button title="Español" onPress={() => changeLocale('es')} />
+      </View>
+      <Calendar key={key} />
+    </View>
+  );
+};
+```
+
+## Important notes
+
+<Note>
+  LocaleConfig changes are global and affect all calendar components. Configure locales before rendering any calendars, typically in your app's entry point.
+</Note>
+
+<Note>
+  When changing locale dynamically, you may need to force calendar components to re-render using a key prop or state update.
+</Note>
+
+<Note>
+  Day names arrays must start with Sunday (index 0), even if your calendar displays Monday as the first day of the week. Use the `firstDay` prop on calendar components to change the displayed first day.
+</Note>
+
+## Related
+
+- [Calendar](/api/calendar) - Basic calendar component
+- [CalendarUtils](/api/calendar-utils) - Utility functions including `getDefaultLocale()`
+- [Theme](/api/types) - Styling calendar components

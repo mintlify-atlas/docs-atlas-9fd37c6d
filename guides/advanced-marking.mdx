@@ -1,0 +1,526 @@
+---
+title: Advanced marking
+description: Master advanced date marking patterns including dots, periods, multi-marking, and custom styles
+---
+
+## Overview
+
+React Native Calendars supports five types of date marking: dot, multi-dot, period, multi-period, and custom. Each marking type serves different use cases and can be combined with various styling options.
+
+## Marking types
+
+Set the marking type using the `markingType` prop:
+
+```jsx
+<Calendar
+  markingType={'dot'}         // Single dot
+  markingType={'multi-dot'}   // Multiple dots
+  markingType={'period'}      // Date ranges
+  markingType={'multi-period'} // Multiple ranges
+  markingType={'custom'}      // Custom styling
+/>
+```
+
+## Dot marking
+
+The default marking type. Displays a dot under the date.
+
+### Basic dot marking
+
+```jsx
+<Calendar
+  markedDates={{
+    '2024-11-06': {selected: true, marked: true, selectedColor: 'blue'},
+    '2024-11-07': {marked: true},
+    '2024-11-08': {marked: true, dotColor: 'red'}
+  }}
+/>
+```
+
+### Dot marking properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `marked` | boolean | Show dot marker |
+| `dotColor` | string | Color of the dot |
+| `selected` | boolean | Highlight the date |
+| `selectedColor` | string | Background color when selected |
+| `selectedTextColor` | string | Text color when selected |
+| `disabled` | boolean | Disable the date |
+| `disableTouchEvent` | boolean | Disable touch events |
+
+### Advanced dot marking
+
+```jsx
+const marked = {
+  '2024-11-06': {
+    selected: true,
+    disableTouchEvent: true,
+    selectedColor: 'orange',
+    selectedTextColor: 'red'
+  },
+  '2024-11-07': {
+    marked: true,
+    dotColor: 'red'
+  },
+  '2024-11-08': {
+    disabled: true,
+    marked: true
+  }
+};
+
+<Calendar markedDates={marked} />
+```
+
+## Multi-dot marking
+
+Display multiple dots under a single date for showing multiple events.
+
+```jsx
+<Calendar
+  markingType={'multi-dot'}
+  markedDates={{
+    '2024-11-06': {
+      selected: true,
+      dots: [
+        {key: 'vacation', color: 'blue', selectedDotColor: 'red'},
+        {key: 'massage', color: 'red', selectedDotColor: 'white'}
+      ]
+    },
+    '2024-11-07': {
+      dots: [
+        {key: 'vacation', color: 'green'},
+        {key: 'massage', color: 'red'},
+        {key: 'workout', color: 'yellow'}
+      ]
+    }
+  }}
+/>
+```
+
+<Note>
+Each dot requires a unique `key` property for React reconciliation.
+</Note>
+
+### Dot properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `key` | string | Unique identifier |
+| `color` | string | Dot color (required) |
+| `selectedDotColor` | string | Color when day is selected |
+
+### Multi-dot with disabled dates
+
+```jsx
+<Calendar
+  markingType={'multi-dot'}
+  markedDates={{
+    '2024-11-06': {
+      disabled: true,
+      dots: [
+        {key: 'vacation', color: 'green', selectedDotColor: 'red'},
+        {key: 'massage', color: 'red', selectedDotColor: 'green'}
+      ]
+    }
+  }}
+/>
+```
+
+## Period marking
+
+Highlight date ranges with connected backgrounds.
+
+### Basic period marking
+
+```jsx
+<Calendar
+  markingType={'period'}
+  markedDates={{
+    '2024-11-09': {startingDay: true, color: '#50cebb', textColor: 'white'},
+    '2024-11-10': {color: '#70d7c7'},
+    '2024-11-11': {color: '#70d7c7', textColor: 'white'},
+    '2024-11-12': {color: '#70d7c7'},
+    '2024-11-13': {endingDay: true, color: '#50cebb', textColor: 'white'}
+  }}
+/>
+```
+
+### Period marking properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `startingDay` | boolean | First day of period |
+| `endingDay` | boolean | Last day of period |
+| `color` | string | Background color of period |
+| `textColor` | string | Text color for the date |
+
+### Single-day period
+
+```jsx
+<Calendar
+  markingType={'period'}
+  markedDates={{
+    '2024-11-12': {startingDay: true, endingDay: true, color: 'green'}
+  }}
+/>
+```
+
+### Period with custom styling
+
+```jsx
+<Calendar
+  markingType={'period'}
+  markedDates={{
+    '2024-11-09': {
+      startingDay: true,
+      color: '#50cebb',
+      textColor: 'white'
+    },
+    '2024-11-10': {
+      color: '#70d7c7',
+      customTextStyle: {
+        color: '#FFFAAA',
+        fontWeight: '700'
+      }
+    },
+    '2024-11-13': {
+      endingDay: true,
+      color: '#50cebb',
+      textColor: 'white',
+      customContainerStyle: {
+        borderTopRightRadius: 5,
+        borderBottomRightRadius: 5,
+        backgroundColor: 'green'
+      }
+    }
+  }}
+/>
+```
+
+### Period marking with dots
+
+Combine period marking with dots:
+
+```jsx
+<Calendar
+  markingType={'period'}
+  markedDates={{
+    '2024-11-06': {
+      marked: true,
+      dotColor: '#50cebb'
+    },
+    '2024-11-09': {
+      startingDay: true,
+      color: '#50cebb',
+      textColor: 'white'
+    },
+    '2024-11-11': {
+      color: '#70d7c7',
+      textColor: 'white',
+      marked: true,
+      dotColor: 'white'
+    },
+    '2024-11-13': {
+      endingDay: true,
+      color: '#50cebb',
+      textColor: 'white'
+    }
+  }}
+/>
+```
+
+## Multi-period marking
+
+Display multiple overlapping period ranges on the same date.
+
+```jsx
+<Calendar
+  markingType={'multi-period'}
+  markedDates={{
+    '2024-11-06': {
+      periods: [
+        {startingDay: true, endingDay: false, color: 'green'},
+        {startingDay: true, endingDay: false, color: 'orange'}
+      ]
+    },
+    '2024-11-07': {
+      periods: [
+        {startingDay: false, endingDay: true, color: 'green'},
+        {startingDay: false, endingDay: true, color: 'orange'},
+        {startingDay: true, endingDay: false, color: 'pink'}
+      ]
+    },
+    '2024-11-10': {
+      periods: [
+        {startingDay: true, endingDay: true, color: 'orange'},
+        {color: 'transparent'},
+        {startingDay: false, endingDay: false, color: 'pink'}
+      ]
+    }
+  }}
+/>
+```
+
+<Info>
+Use `color: 'transparent'` to create spacing between period layers.
+</Info>
+
+### Multi-period properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `periods` | array | Array of period objects |
+| `startingDay` | boolean | First day of this period |
+| `endingDay` | boolean | Last day of this period |
+| `color` | string | Background color |
+
+## Custom marking
+
+Apply custom styles to any date using the `custom` marking type.
+
+### Basic custom marking
+
+```jsx
+<Calendar
+  markingType={'custom'}
+  markedDates={{
+    '2024-11-06': {
+      customStyles: {
+        container: {
+          backgroundColor: 'white',
+          elevation: 2
+        },
+        text: {
+          color: 'red',
+          marginTop: 0
+        }
+      }
+    },
+    '2024-11-07': {
+      selected: true  // Use default selected style
+    }
+  }}
+/>
+```
+
+### Advanced custom styles
+
+```jsx
+<Calendar
+  markingType={'custom'}
+  markedDates={{
+    '2024-11-06': {
+      customStyles: {
+        container: {
+          backgroundColor: 'red',
+          elevation: 4
+        },
+        text: {
+          color: 'white'
+        }
+      }
+    },
+    '2024-11-07': {
+      customStyles: {
+        container: {
+          backgroundColor: 'green',
+          borderRadius: 5
+        },
+        text: {
+          color: 'white'
+        }
+      }
+    },
+    '2024-11-08': {
+      customStyles: {
+        text: {
+          color: 'black',
+          fontWeight: 'bold'
+        }
+      }
+    },
+    '2024-11-09': {
+      customStyles: {
+        container: {
+          backgroundColor: 'pink',
+          elevation: 4,
+          borderColor: 'purple',
+          borderWidth: 5
+        },
+        text: {
+          marginTop: 3,
+          fontSize: 11,
+          color: 'black'
+        }
+      }
+    },
+    '2024-11-10': {
+      customStyles: {
+        container: {
+          backgroundColor: 'orange',
+          borderRadius: 0
+        }
+      }
+    }
+  }}
+/>
+```
+
+<Tip>
+Custom marking gives you complete control over the appearance of individual dates.
+</Tip>
+
+## Inactive days
+
+Mark certain days as inactive (different from disabled):
+
+```jsx
+<Calendar
+  disableAllTouchEventsForInactiveDays={true}
+  markedDates={{
+    '2024-11-03': {inactive: true},
+    '2024-11-04': {inactive: true}
+  }}
+  theme={{
+    textInactiveColor: '#a68a9f',
+    inactiveDotColor: '#a68a9f'
+  }}
+/>
+```
+
+### Period marking with inactive days
+
+```jsx
+<Calendar
+  markingType={'period'}
+  markedDates={{
+    '2024-11-09': {startingDay: true, color: '#50cebb', textColor: 'white'},
+    '2024-11-10': {color: '#70d7c7'},
+    '2024-11-11': {color: '#70d7c7', inactive: true, marked: true},
+    '2024-11-12': {endingDay: true, color: '#50cebb', textColor: 'white'},
+    '2024-11-25': {inactive: true, disableTouchEvent: true}
+  }}
+  theme={{
+    textInactiveColor: '#a68a9f',
+    inactiveDotColor: '#a68a9f'
+  }}
+/>
+```
+
+## Dynamic marking
+
+Generate marked dates dynamically:
+
+```jsx
+import {useState, useMemo} from 'react';
+
+const CalendarWithDynamicMarking = () => {
+  const [selected, setSelected] = useState('2024-11-06');
+  
+  const marked = useMemo(() => {
+    const dates = {};
+    
+    // Mark selected date
+    dates[selected] = {
+      selected: true,
+      disableTouchEvent: true,
+      selectedColor: 'orange'
+    };
+    
+    // Mark other dates
+    const date = new Date(selected);
+    for (let i = 1; i <= 5; i++) {
+      const nextDate = new Date(date);
+      nextDate.setDate(date.getDate() + i);
+      const dateString = nextDate.toISOString().split('T')[0];
+      
+      dates[dateString] = {
+        marked: true,
+        dotColor: 'red'
+      };
+    }
+    
+    return dates;
+  }, [selected]);
+  
+  return (
+    <Calendar
+      markedDates={marked}
+      onDayPress={(day) => setSelected(day.dateString)}
+    />
+  );
+};
+```
+
+<Warning>
+Always use `useMemo` for marked dates to prevent unnecessary re-renders.
+</Warning>
+
+## Combining marking with restrictions
+
+Combine marking with date restrictions:
+
+```jsx
+<Calendar
+  minDate={'2024-11-01'}
+  maxDate={'2024-11-30'}
+  disableAllTouchEventsForDisabledDays={true}
+  markedDates={{
+    '2024-11-06': {selected: true, marked: true},
+    '2024-11-10': {disabled: true, activeOpacity: 0}
+  }}
+/>
+```
+
+## Performance optimization
+
+Optimize marking for large date ranges:
+
+```jsx
+const getMarkedDates = useCallback((startDate, endDate) => {
+  const marked = {};
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  
+  while (start <= end) {
+    const dateString = start.toISOString().split('T')[0];
+    marked[dateString] = {
+      startingDay: dateString === startDate,
+      endingDay: dateString === endDate,
+      color: '#70d7c7',
+      textColor: 'white'
+    };
+    start.setDate(start.getDate() + 1);
+  }
+  
+  return marked;
+}, []);
+
+const markedDates = useMemo(
+  () => getMarkedDates('2024-11-01', '2024-11-15'),
+  [getMarkedDates]
+);
+
+<Calendar markingType={'period'} markedDates={markedDates} />
+```
+
+## Best practices
+
+<Steps>
+  <Step title="Choose the right marking type">
+    Use dot marking for simple events, period marking for ranges, and custom marking for complex styling needs.
+  </Step>
+  <Step title="Use memoization">
+    Always wrap marked dates in `useMemo` to prevent recalculation on every render.
+  </Step>
+  <Step title="Keep marking data flat">
+    Store marking data in a flat object structure for better performance.
+  </Step>
+  <Step title="Consider color contrast">
+    Ensure marked dates have sufficient contrast with the background for accessibility.
+  </Step>
+  <Step title="Test marking combinations">
+    Test different marking combinations to ensure they render correctly on both platforms.
+  </Step>
+</Steps>

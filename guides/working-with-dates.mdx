@@ -1,0 +1,413 @@
+---
+title: Working with dates
+description: Learn how to work with dates, date formatting, and date utilities in React Native Calendars
+---
+
+## Overview
+
+React Native Calendars uses XDate internally for date manipulation and provides utilities for common date operations. Understanding how to work with dates is essential for effective calendar integration.
+
+## Date format
+
+The library uses the `YYYY-MM-DD` string format for all date operations:
+
+```jsx
+import {Calendar} from 'react-native-calendars';
+
+<Calendar
+  current={'2024-11-06'}
+  minDate={'2024-01-01'}
+  maxDate={'2024-12-31'}
+/>
+```
+
+<Note>
+All dates must be in the format 'YYYY-MM-DD'. Other formats will not work correctly.
+</Note>
+
+## DateData object
+
+When handling calendar events, you'll receive a DateData object:
+
+```typescript
+interface DateData {
+  year: number;        // e.g., 2024
+  month: number;       // 1-12
+  day: number;         // 1-31
+  timestamp: number;   // Unix timestamp
+  dateString: string;  // 'YYYY-MM-DD'
+}
+```
+
+### Using DateData
+
+```jsx
+const onDayPress = (day) => {
+  console.log('Selected date:', day.dateString);
+  console.log('Year:', day.year);
+  console.log('Month:', day.month);
+  console.log('Day:', day.day);
+  console.log('Timestamp:', day.timestamp);
+};
+
+<Calendar onDayPress={onDayPress} />
+```
+
+## Setting the initial date
+
+There are two ways to set the initially visible month:
+
+### Using `current`
+
+```jsx
+<Calendar
+  current={'2024-11-06'}
+  onDayPress={day => console.log('selected day', day)}
+/>
+```
+
+### Using `initialDate`
+
+Use `initialDate` if you want to update it dynamically:
+
+```jsx
+const [initialDate, setInitialDate] = useState('2024-11-06');
+
+<Calendar
+  initialDate={initialDate}
+  onDayPress={day => console.log('selected day', day)}
+/>
+```
+
+<Info>
+`initialDate` will re-initialize the calendar when changed, while `current` only sets the initial state.
+</Info>
+
+## Restricting date selection
+
+Control which dates users can select:
+
+### Min and max dates
+
+```jsx
+<Calendar
+  minDate={'2024-01-01'}
+  maxDate={'2024-12-31'}
+  disableAllTouchEventsForDisabledDays={true}
+/>
+```
+
+### Allow selection outside range
+
+```jsx
+<Calendar
+  minDate={'2024-01-01'}
+  maxDate={'2024-12-31'}
+  allowSelectionOutOfRange={true}
+/>
+```
+
+<Warning>
+Dates before `minDate` or after `maxDate` will be grayed out unless `allowSelectionOutOfRange` is enabled.
+</Warning>
+
+## Disabling specific days
+
+### Disable by day of week
+
+Disable specific days of the week (0 = Sunday, 6 = Saturday):
+
+```jsx
+<Calendar
+  disabledByWeekDays={[0, 6]}  // Disable weekends
+  disableAllTouchEventsForDisabledDays={true}
+/>
+```
+
+### Disable all days by default
+
+```jsx
+<Calendar
+  disabledByDefault={true}
+  markedDates={{
+    '2024-11-06': {disabled: false, selected: true}
+  }}
+/>
+```
+
+## CalendarUtils
+
+The library exports `CalendarUtils` for common date operations:
+
+```jsx
+import {CalendarUtils} from 'react-native-calendars';
+
+const today = CalendarUtils.getCalendarDateString(new Date());
+console.log(today); // '2024-11-06'
+```
+
+### Getting dates relative to a reference
+
+```jsx
+const INITIAL_DATE = '2024-11-06';
+
+const getDate = (count) => {
+  const date = new Date(INITIAL_DATE);
+  const newDate = date.setDate(date.getDate() + count);
+  return CalendarUtils.getCalendarDateString(newDate);
+};
+
+const yesterday = getDate(-1);
+const tomorrow = getDate(1);
+const nextWeek = getDate(7);
+```
+
+## Date manipulation with XDate
+
+While not directly exposed, you can use XDate for advanced date operations:
+
+```jsx
+import XDate from 'xdate';
+
+const date = new XDate('2024-11-06');
+
+// Add/subtract time
+const tomorrow = date.clone().addDays(1);
+const nextMonth = date.clone().addMonths(1);
+const nextYear = date.clone().addYears(1);
+
+// Format dates
+const formatted = date.toString('MMMM dd, yyyy');
+// 'November 06, 2024'
+```
+
+## Date parsing utilities
+
+The library provides internal utilities that you can replicate:
+
+### Converting to marking format
+
+```jsx
+const toMarkingFormat = (date) => {
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const today = toMarkingFormat(new Date());
+```
+
+### Parsing various date formats
+
+```jsx
+const parseDate = (input) => {
+  if (input instanceof Date) {
+    return toMarkingFormat(input);
+  }
+  if (typeof input === 'number') {
+    // Timestamp
+    return toMarkingFormat(new Date(input));
+  }
+  if (typeof input === 'string') {
+    // ISO string or YYYY-MM-DD
+    return toMarkingFormat(new Date(input));
+  }
+  return input;
+};
+```
+
+## Working with month changes
+
+Handle month changes to load new data:
+
+```jsx
+const [currentMonth, setCurrentMonth] = useState('2024-11-06');
+
+const onMonthChange = (month) => {
+  console.log('Month changed to:', month.dateString);
+  setCurrentMonth(month.dateString);
+  // Load data for the new month
+};
+
+<Calendar
+  current={currentMonth}
+  onMonthChange={onMonthChange}
+/>
+```
+
+## First day of week
+
+Control which day starts the week:
+
+```jsx
+<Calendar
+  firstDay={0}  // Sunday (default)
+/>
+
+<Calendar
+  firstDay={1}  // Monday
+/>
+
+<Calendar
+  firstDay={6}  // Saturday
+/>
+```
+
+<Info>
+The `firstDay` prop accepts a number from 0 (Sunday) to 6 (Saturday).
+</Info>
+
+## Getting week dates
+
+Calculate all dates in a week:
+
+```jsx
+const getWeekDates = (dateString, firstDayOfWeek = 0) => {
+  const date = new Date(dateString);
+  const day = date.getDay();
+  const diff = (day - firstDayOfWeek + 7) % 7;
+  
+  const weekStart = new Date(date);
+  weekStart.setDate(date.getDate() - diff);
+  
+  const weekDates = [];
+  for (let i = 0; i < 7; i++) {
+    const current = new Date(weekStart);
+    current.setDate(weekStart.getDate() + i);
+    weekDates.push(toMarkingFormat(current));
+  }
+  
+  return weekDates;
+};
+
+const week = getWeekDates('2024-11-06', 1); // Start on Monday
+```
+
+## Checking if date is today
+
+```jsx
+const isToday = (dateString) => {
+  const today = new Date();
+  const date = new Date(dateString);
+  
+  return (
+    date.getFullYear() === today.getFullYear() &&
+    date.getMonth() === today.getMonth() &&
+    date.getDate() === today.getDate()
+  );
+};
+```
+
+## Date comparison
+
+```jsx
+const isSameDate = (date1String, date2String) => {
+  return date1String === date2String;
+};
+
+const isSameMonth = (date1String, date2String) => {
+  const date1 = new Date(date1String);
+  const date2 = new Date(date2String);
+  
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth()
+  );
+};
+
+const isPast = (dateString) => {
+  const date = new Date(dateString);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  return date < today;
+};
+```
+
+## Date ranges
+
+Generate a range of dates:
+
+```jsx
+const getDateRange = (startDate, endDate) => {
+  const dates = [];
+  const current = new Date(startDate);
+  const end = new Date(endDate);
+  
+  while (current <= end) {
+    dates.push(toMarkingFormat(current));
+    current.setDate(current.getDate() + 1);
+  }
+  
+  return dates;
+};
+
+const range = getDateRange('2024-11-01', '2024-11-07');
+// ['2024-11-01', '2024-11-02', ..., '2024-11-07']
+```
+
+## Managing selected dates
+
+Track and update selected dates:
+
+```jsx
+const [selectedDates, setSelectedDates] = useState({});
+
+const onDayPress = (day) => {
+  const dateString = day.dateString;
+  
+  // Single selection
+  setSelectedDates({
+    [dateString]: {
+      selected: true,
+      selectedColor: 'blue'
+    }
+  });
+  
+  // Multiple selection
+  setSelectedDates(prev => ({
+    ...prev,
+    [dateString]: {
+      selected: !prev[dateString]?.selected,
+      selectedColor: 'blue'
+    }
+  }));
+};
+
+<Calendar
+  markedDates={selectedDates}
+  onDayPress={onDayPress}
+/>
+```
+
+## Timezone considerations
+
+<Warning>
+XDate creates dates in the local timezone by default. Be careful when working with timestamps from different timezones.
+</Warning>
+
+```jsx
+// Create date in UTC
+const utcDate = new XDate('2024-11-06', true);
+
+// Get UTC timestamp
+const timestamp = utcDate.getTime();
+```
+
+## Best practices
+
+<Steps>
+  <Step title="Always use YYYY-MM-DD format">
+    Stick to the 'YYYY-MM-DD' format for all date strings to ensure consistency.
+  </Step>
+  <Step title="Handle timezones carefully">
+    Be aware of timezone differences when working with timestamps and date strings.
+  </Step>
+  <Step title="Validate date inputs">
+    Always validate dates from user input or external sources before passing to the calendar.
+  </Step>
+  <Step title="Use memoization">
+    Memoize date calculations and marked dates objects to optimize performance.
+  </Step>
+</Steps>

@@ -1,0 +1,586 @@
+---
+title: Performance optimization
+description: Best practices and techniques for optimizing React Native Calendars performance
+---
+
+## Overview
+
+React Native Calendars is implemented entirely in JavaScript, making performance optimization crucial for smooth user experiences. This guide covers strategies to maximize performance in your calendar implementations.
+
+## React optimization
+
+### Memoize marked dates
+
+Always wrap marked dates in `useMemo` to prevent unnecessary recalculations:
+
+```jsx
+import {useMemo} from 'react';
+
+const CalendarComponent = () => {
+  const [selected, setSelected] = useState('2024-11-06');
+  
+  // Good: Memoized marked dates
+  const markedDates = useMemo(() => {
+    return {
+      [selected]: {
+        selected: true,
+        selectedColor: 'blue'
+      }
+    };
+  }, [selected]);
+  
+  return <Calendar markedDates={markedDates} />;
+};
+```
+
+<Warning>
+Never create marked dates inline. This causes the calendar to re-render on every parent component render.
+</Warning>
+
+```jsx
+// Bad: Creates new object on every render
+<Calendar
+  markedDates={{
+    '2024-11-06': {selected: true}
+  }}
+/>
+
+// Good: Memoized object
+const markedDates = useMemo(() => ({
+  '2024-11-06': {selected: true}
+}), []);
+
+<Calendar markedDates={markedDates} />
+```
+
+### Memoize theme objects
+
+```jsx
+const theme = useMemo(() => ({
+  backgroundColor: '#ffffff',
+  calendarBackground: '#ffffff',
+  selectedDayBackgroundColor: '#00adf5',
+  selectedDayTextColor: '#ffffff',
+  todayTextColor: '#00adf5',
+  dayTextColor: '#2d4150'
+}), []);
+
+<Calendar theme={theme} />
+```
+
+### Use callbacks for handlers
+
+Wrap event handlers in `useCallback`:
+
+```jsx
+const onDayPress = useCallback((day) => {
+  console.log('selected day', day);
+  setSelected(day.dateString);
+}, []);
+
+const onMonthChange = useCallback((month) => {
+  console.log('month changed', month);
+}, []);
+
+<Calendar
+  onDayPress={onDayPress}
+  onMonthChange={onMonthChange}
+/>
+```
+
+## Component optimization
+
+### Avoid unnecessary props
+
+Only pass props that are needed:
+
+```jsx
+// Bad: Passing unnecessary props
+<Calendar
+  enableSwipeMonths={false}
+  hideArrows={false}
+  hideExtraDays={false}
+  showWeekNumbers={false}
+/>
+
+// Good: Omit props with default values
+<Calendar />
+```
+
+### Use CalendarList efficiently
+
+For scrollable calendars, `CalendarList` is more efficient than multiple `Calendar` components:
+
+```jsx
+import {CalendarList} from 'react-native-calendars';
+
+<CalendarList
+  pastScrollRange={6}
+  futureScrollRange={6}
+  scrollEnabled={true}
+  showScrollIndicator={true}
+/>
+```
+
+<Info>
+`CalendarList` renders months lazily as you scroll, improving initial load time.
+</Info>
+
+### Limit scroll range
+
+Restrict the scroll range to reduce memory usage:
+
+```jsx
+<CalendarList
+  pastScrollRange={3}   // Only 3 months back
+  futureScrollRange={3}  // Only 3 months ahead
+/>
+```
+
+## Marking optimization
+
+### Flat date structures
+
+Keep marked dates in a flat object structure:
+
+```jsx
+// Good: Flat structure
+const markedDates = useMemo(() => ({
+  '2024-11-06': {selected: true},
+  '2024-11-07': {marked: true},
+  '2024-11-08': {marked: true}
+}), []);
+
+// Avoid: Nested structures requiring transformation
+const events = [
+  {date: '2024-11-06', type: 'selected'},
+  {date: '2024-11-07', type: 'marked'}
+];
+```
+
+### Batch date calculations
+
+Calculate all marked dates at once instead of incrementally:
+
+```jsx
+const getMarkedDates = useCallback((events) => {
+  const marked = {};
+  
+  events.forEach(event => {
+    marked[event.date] = {
+      marked: true,
+      dotColor: event.color
+    };
+  });
+  
+  return marked;
+}, []);
+
+const markedDates = useMemo(
+  () => getMarkedDates(events),
+  [events, getMarkedDates]
+);
+```
+
+### Limit marking complexity
+
+Simpler marking types perform better:
+
+```jsx
+// Fastest: Simple dot marking
+<Calendar
+  markedDates={{
+    '2024-11-06': {marked: true}
+  }}
+/>
+
+// Moderate: Multi-dot (2-3 dots)
+<Calendar
+  markingType={'multi-dot'}
+  markedDates={{
+    '2024-11-06': {
+      dots: [
+        {key: 'event1', color: 'blue'},
+        {key: 'event2', color: 'red'}
+      ]
+    }
+  }}
+/>
+
+// Slower: Complex custom marking
+<Calendar
+  markingType={'custom'}
+  markedDates={{
+    '2024-11-06': {
+      customStyles: {
+        container: {/* complex styles */},
+        text: {/* complex styles */}
+      }
+    }
+  }}
+/>
+```
+
+## Rendering optimization
+
+### Hide extra days
+
+Improve performance by hiding days from other months:
+
+```jsx
+<Calendar
+  hideExtraDays={true}
+/>
+```
+
+### Disable month change
+
+Prevent unnecessary month transitions:
+
+```jsx
+<Calendar
+  disableMonthChange={true}
+/>
+```
+
+### Optimize custom components
+
+When using custom day components, keep them lightweight:
+
+```jsx
+// Good: Simple component
+const CustomDay = React.memo(({date, state}) => (
+  <View>
+    <Text style={state === 'disabled' ? styles.disabled : styles.default}>
+      {date?.day}
+    </Text>
+  </View>
+));
+
+// Bad: Heavy component with calculations
+const HeavyCustomDay = ({date, state}) => {
+  // Avoid heavy calculations here
+  const complexCalculation = performExpensiveOperation(date);
+  
+  return (
+    <View>
+      <Text>{complexCalculation}</Text>
+    </View>
+  );
+};
+```
+
+<Tip>
+Use `React.memo` for custom day components to prevent unnecessary re-renders.
+</Tip>
+
+### Custom header optimization
+
+```jsx
+const CustomHeader = React.memo(
+  React.forwardRef((props, ref) => {
+    return (
+      <View ref={ref} {...props}>
+        <Text>{props.month.toString('MMMM yyyy')}</Text>
+      </View>
+    );
+  })
+);
+
+<Calendar customHeader={CustomHeader} />
+```
+
+## Data loading strategies
+
+### Lazy load marked dates
+
+Load marked dates only for visible months:
+
+```jsx
+const [markedDates, setMarkedDates] = useState({});
+
+const onMonthChange = useCallback((month) => {
+  // Load data only for the visible month
+  fetchEventsForMonth(month.dateString).then(events => {
+    setMarkedDates(prev => ({
+      ...prev,
+      ...events
+    }));
+  });
+}, []);
+
+<Calendar
+  markedDates={markedDates}
+  onMonthChange={onMonthChange}
+/>
+```
+
+### Cache marked dates
+
+Cache calculated marked dates to avoid recalculation:
+
+```jsx
+const dateCache = useRef({});
+
+const getMarkedDatesForMonth = useCallback((monthString) => {
+  if (dateCache.current[monthString]) {
+    return dateCache.current[monthString];
+  }
+  
+  const marked = calculateMarkedDates(monthString);
+  dateCache.current[monthString] = marked;
+  
+  return marked;
+}, []);
+```
+
+### Debounce updates
+
+Debounce frequent updates to marked dates:
+
+```jsx
+import {useMemo, useCallback} from 'react';
+import debounce from 'lodash/debounce';
+
+const updateMarkedDates = useCallback(
+  debounce((dates) => {
+    setMarkedDates(dates);
+  }, 300),
+  []
+);
+```
+
+## Platform-specific optimization
+
+### iOS optimization
+
+```jsx
+import {Platform} from 'react-native';
+
+const calendarProps = Platform.select({
+  ios: {
+    enableSwipeMonths: true,
+    // iOS handles swipe gestures efficiently
+  },
+  android: {
+    enableSwipeMonths: false,
+    // Use arrow navigation on Android for better performance
+  }
+});
+
+<Calendar {...calendarProps} />
+```
+
+### Reduce shadows and elevation
+
+```jsx
+// Heavy on performance
+const heavyTheme = {
+  stylesheet: {
+    day: {
+      base: {
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84
+      }
+    }
+  }
+};
+
+// Lighter alternative
+const lightTheme = {
+  stylesheet: {
+    day: {
+      base: {
+        borderWidth: 1,
+        borderColor: '#e0e0e0'
+      }
+    }
+  }
+};
+```
+
+## Memory management
+
+### Clean up on unmount
+
+```jsx
+const CalendarComponent = () => {
+  const [markedDates, setMarkedDates] = useState({});
+  
+  useEffect(() => {
+    return () => {
+      // Clean up when component unmounts
+      setMarkedDates({});
+    };
+  }, []);
+  
+  return <Calendar markedDates={markedDates} />;
+};
+```
+
+### Limit date range
+
+Restrict the selectable date range:
+
+```jsx
+<Calendar
+  minDate={'2024-01-01'}
+  maxDate={'2024-12-31'}
+/>
+```
+
+<Info>
+Limiting the date range reduces the number of dates the calendar needs to manage.
+</Info>
+
+## Agenda optimization
+
+For agenda views, optimize item rendering:
+
+```jsx
+import {Agenda} from 'react-native-calendars';
+
+const renderItem = useCallback((item) => {
+  return <AgendaItem item={item} />;
+}, []);
+
+const renderEmptyDate = useCallback(() => {
+  return <View style={styles.emptyDate} />;
+}, []);
+
+<Agenda
+  items={items}
+  renderItem={renderItem}
+  renderEmptyDate={renderEmptyDate}
+/>
+```
+
+### Virtualize agenda items
+
+```jsx
+import {AgendaList} from 'react-native-calendars';
+
+// AgendaList uses FlatList internally for better performance
+<AgendaList
+  sections={sections}
+  renderItem={renderItem}
+/>
+```
+
+## Debugging performance
+
+### Use React DevTools Profiler
+
+```jsx
+import {Profiler} from 'react';
+
+const onRenderCallback = (id, phase, actualDuration) => {
+  console.log(`${id} ${phase} took ${actualDuration}ms`);
+};
+
+<Profiler id="Calendar" onRender={onRenderCallback}>
+  <Calendar markedDates={markedDates} />
+</Profiler>
+```
+
+### Monitor re-renders
+
+```jsx
+const CalendarComponent = () => {
+  const renderCount = useRef(0);
+  
+  useEffect(() => {
+    renderCount.current += 1;
+    console.log('Calendar rendered:', renderCount.current);
+  });
+  
+  return <Calendar />;
+};
+```
+
+## Performance checklist
+
+<Steps>
+  <Step title="Memoize all objects">
+    Use `useMemo` for markedDates, theme, and other objects passed as props.
+  </Step>
+  <Step title="Memoize callbacks">
+    Wrap event handlers in `useCallback` to prevent recreation on every render.
+  </Step>
+  <Step title="Limit complexity">
+    Use simpler marking types and avoid heavy custom components when possible.
+  </Step>
+  <Step title="Lazy load data">
+    Only load marked dates for visible months, not the entire year.
+  </Step>
+  <Step title="Cache calculations">
+    Cache expensive date calculations to avoid repeating work.
+  </Step>
+  <Step title="Test on devices">
+    Always test performance on real devices, not just simulators.
+  </Step>
+  <Step title="Monitor bundle size">
+    Keep an eye on bundle size impact when importing calendar components.
+  </Step>
+</Steps>
+
+## Common performance pitfalls
+
+<Warning>
+Avoid these common mistakes that can severely impact performance:
+</Warning>
+
+### Creating objects inline
+
+```jsx
+// Bad
+<Calendar markedDates={{'2024-11-06': {selected: true}}} />
+
+// Good
+const markedDates = useMemo(() => ({
+  '2024-11-06': {selected: true}
+}), []);
+<Calendar markedDates={markedDates} />
+```
+
+### Unnecessary re-renders
+
+```jsx
+// Bad: Recreates function on every render
+<Calendar onDayPress={(day) => console.log(day)} />
+
+// Good: Memoized callback
+const onDayPress = useCallback((day) => {
+  console.log(day);
+}, []);
+<Calendar onDayPress={onDayPress} />
+```
+
+### Loading all data upfront
+
+```jsx
+// Bad: Load entire year of events
+const markedDates = getAllEventsForYear();
+
+// Good: Load per month
+const onMonthChange = useCallback((month) => {
+  const monthEvents = getEventsForMonth(month);
+  setMarkedDates(monthEvents);
+}, []);
+```
+
+## Best practices summary
+
+<Tip>
+Follow these best practices for optimal calendar performance:
+- Always memoize marked dates and theme objects
+- Use `useCallback` for event handlers
+- Keep custom components lightweight
+- Lazy load data per month
+- Cache expensive calculations
+- Test on real devices
+- Monitor re-renders with React DevTools
+</Tip>

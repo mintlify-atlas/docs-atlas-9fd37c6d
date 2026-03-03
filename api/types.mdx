@@ -1,0 +1,498 @@
+---
+title: TypeScript types
+description: TypeScript type definitions for React Native Calendars
+---
+
+Comprehensive TypeScript type definitions for React Native Calendars components, props, and utilities.
+
+## Core types
+
+### DateData
+
+Object representing a date with parsed components.
+
+```typescript
+interface DateData {
+  year: number;
+  month: number;
+  day: number;
+  timestamp: number;
+  dateString: string;
+}
+```
+
+<ResponseField name="year" type="number">
+  Full year (e.g., 2024)
+</ResponseField>
+
+<ResponseField name="month" type="number">
+  Month number (1-12, where 1 = January)
+</ResponseField>
+
+<ResponseField name="day" type="number">
+  Day of month (1-31)
+</ResponseField>
+
+<ResponseField name="timestamp" type="number">
+  Unix timestamp in milliseconds
+</ResponseField>
+
+<ResponseField name="dateString" type="string">
+  Date in 'yyyy-MM-dd' format
+</ResponseField>
+
+**Example:**
+
+```typescript
+const dateData: DateData = {
+  year: 2024,
+  month: 3,
+  day: 15,
+  timestamp: 1710460800000,
+  dateString: '2024-03-15'
+};
+```
+
+### DayState
+
+String literal type for day state.
+
+```typescript
+type DayState = 'selected' | 'disabled' | 'inactive' | 'today' | '';
+```
+
+<ResponseField name="selected" type="'selected'">
+  Day is currently selected
+</ResponseField>
+
+<ResponseField name="disabled" type="'disabled'">
+  Day is disabled and cannot be selected
+</ResponseField>
+
+<ResponseField name="inactive" type="'inactive'">
+  Day is outside the current month
+</ResponseField>
+
+<ResponseField name="today" type="'today'">
+  Day is today's date
+</ResponseField>
+
+<ResponseField name="empty" type="''">
+  Default state (empty string)
+</ResponseField>
+
+### Direction
+
+Direction for calendar navigation.
+
+```typescript
+type Direction = 'left' | 'right';
+```
+
+### MarkingTypes
+
+Available marking types for calendar days.
+
+```typescript
+type MarkingTypes = 'dot' | 'multi-dot' | 'period' | 'multi-period' | 'custom';
+```
+
+<ResponseField name="dot" type="'dot'">
+  Single colored dot below the date
+</ResponseField>
+
+<ResponseField name="multi-dot" type="'multi-dot'">
+  Multiple colored dots below the date
+</ResponseField>
+
+<ResponseField name="period" type="'period'">
+  Background color spanning a date range
+</ResponseField>
+
+<ResponseField name="multi-period" type="'multi-period'">
+  Multiple overlapping period markings
+</ResponseField>
+
+<ResponseField name="custom" type="'custom'">
+  Custom marking component
+</ResponseField>
+
+### MarkedDates
+
+Object mapping date strings to their marking configurations.
+
+```typescript
+type MarkedDates = {
+  [key: string]: MarkingProps;
+};
+```
+
+**Example:**
+
+```typescript
+const markedDates: MarkedDates = {
+  '2024-03-15': {
+    selected: true,
+    selectedColor: '#4A90E2'
+  },
+  '2024-03-16': {
+    marked: true,
+    dotColor: 'red'
+  },
+  '2024-03-17': {
+    disabled: true,
+    disableTouchEvent: true
+  }
+};
+```
+
+## Theme
+
+Comprehensive theme object for customizing calendar appearance.
+
+```typescript
+interface Theme {
+  // Container styles
+  timelineContainer?: object;
+  contentStyle?: ViewStyle;
+  calendarBackground?: string;
+  
+  // Text colors
+  todayTextColor?: string;
+  textSectionTitleColor?: string;
+  textSectionTitleDisabledColor?: string;
+  dayTextColor?: string;
+  selectedDayTextColor?: string;
+  monthTextColor?: string;
+  textDisabledColor?: string;
+  textInactiveColor?: string;
+  
+  // Background colors
+  selectedDayBackgroundColor?: string;
+  todayBackgroundColor?: string;
+  reservationsBackgroundColor?: string;
+  
+  // Arrows
+  arrowColor?: string;
+  disabledArrowColor?: string;
+  arrowHeight?: number;
+  arrowWidth?: number;
+  arrowStyle?: ViewStyle;
+  
+  // Dots
+  dotColor?: string;
+  selectedDotColor?: string;
+  disabledDotColor?: string;
+  inactiveDotColor?: string;
+  todayDotColor?: string;
+  dotStyle?: object;
+  
+  // Indicators
+  indicatorColor?: string;
+  
+  // Typography
+  textDayFontFamily?: TextStyle['fontFamily'];
+  textMonthFontFamily?: TextStyle['fontFamily'];
+  textDayHeaderFontFamily?: TextStyle['fontFamily'];
+  textDayFontWeight?: TextStyle['fontWeight'];
+  textMonthFontWeight?: TextStyle['fontWeight'];
+  textDayHeaderFontWeight?: TextStyle['fontWeight'];
+  textDayFontSize?: number;
+  textMonthFontSize?: number;
+  textDayHeaderFontSize?: number;
+  textDayStyle?: TextStyle;
+  
+  // Agenda specific
+  agendaDayTextColor?: string;
+  agendaDayNumColor?: string;
+  agendaTodayColor?: string;
+  agendaKnobColor?: string;
+  
+  // Today button
+  todayButtonFontFamily?: TextStyle['fontFamily'];
+  todayButtonFontWeight?: TextStyle['fontWeight'];
+  todayButtonFontSize?: number;
+  todayButtonTextColor?: string;
+  todayButtonPosition?: string;
+  
+  // Layout
+  weekVerticalMargin?: number;
+  
+  // Timeline events
+  event?: object;
+  eventTitle?: object;
+  eventSummary?: object;
+  eventTimes?: object;
+  line?: object;
+  verticalLine?: object;
+  nowIndicatorLine?: object;
+  nowIndicatorKnob?: object;
+  timeLabel?: object;
+  
+  // Stylesheets (advanced customization)
+  stylesheet?: {
+    calendar?: {
+      main?: object;
+      header?: object;
+    };
+    day?: {
+      basic?: object;
+      period?: object;
+    };
+    dot?: object;
+    marking?: object;
+    'calendar-list'?: {
+      main?: object;
+    };
+    agenda?: {
+      main?: object;
+      list?: object;
+    };
+    expandable?: {
+      main?: object;
+    };
+  };
+}
+```
+
+**Example:**
+
+```typescript
+const theme: Theme = {
+  backgroundColor: '#ffffff',
+  calendarBackground: '#ffffff',
+  textSectionTitleColor: '#b6c1cd',
+  selectedDayBackgroundColor: '#00adf5',
+  selectedDayTextColor: '#ffffff',
+  todayTextColor: '#00adf5',
+  dayTextColor: '#2d4150',
+  textDisabledColor: '#d9e1e8',
+  dotColor: '#00adf5',
+  selectedDotColor: '#ffffff',
+  arrowColor: 'orange',
+  monthTextColor: 'blue',
+  indicatorColor: 'blue',
+  textDayFontFamily: 'System',
+  textMonthFontFamily: 'System',
+  textDayHeaderFontFamily: 'System',
+  textDayFontWeight: '300',
+  textMonthFontWeight: 'bold',
+  textDayHeaderFontWeight: '300',
+  textDayFontSize: 16,
+  textMonthFontSize: 16,
+  textDayHeaderFontSize: 13
+};
+```
+
+## Agenda types
+
+### AgendaEntry
+
+Represents a single agenda item.
+
+```typescript
+interface AgendaEntry {
+  name: string;
+  height: number;
+  day: string;
+}
+```
+
+<ResponseField name="name" type="string">
+  Name or title of the agenda item
+</ResponseField>
+
+<ResponseField name="height" type="number">
+  Height of the item in pixels
+</ResponseField>
+
+<ResponseField name="day" type="string">
+  Date string in 'yyyy-MM-dd' format
+</ResponseField>
+
+**Example:**
+
+```typescript
+const entry: AgendaEntry = {
+  name: 'Team Meeting',
+  height: 80,
+  day: '2024-03-15'
+};
+```
+
+### AgendaSchedule
+
+Mapping of dates to agenda entries.
+
+```typescript
+type AgendaSchedule = {
+  [date: string]: AgendaEntry[];
+};
+```
+
+**Example:**
+
+```typescript
+const schedule: AgendaSchedule = {
+  '2024-03-15': [
+    { name: 'Team Meeting', height: 80, day: '2024-03-15' },
+    { name: 'Lunch', height: 50, day: '2024-03-15' }
+  ],
+  '2024-03-16': [
+    { name: 'Conference', height: 100, day: '2024-03-16' }
+  ]
+};
+```
+
+### DayAgenda
+
+```typescript
+interface DayAgenda {
+  reservation?: AgendaEntry;
+  date?: XDate;
+}
+```
+
+## Context types
+
+### CalendarContextProps
+
+Calendar context properties provided by CalendarProvider.
+
+```typescript
+interface CalendarContextProps {
+  date: string;
+  prevDate: string;
+  selectedDate: string;
+  setDate: (date: string, source: UpdateSources) => void;
+  updateSource: UpdateSources;
+  setDisabled: (disable: boolean) => void;
+  numberOfDays?: number;
+  timelineLeftInset?: number;
+}
+```
+
+See [CalendarContext](/api/calendar-context) for detailed documentation.
+
+### ContextProp
+
+Helper type for components that receive context.
+
+```typescript
+type ContextProp = {
+  context?: CalendarContextProps;
+};
+```
+
+## Enums
+
+### UpdateSources
+
+Sources of calendar updates.
+
+```typescript
+enum UpdateSources {
+  CALENDAR_INIT = 'calendarInit',
+  PROP_UPDATE = 'propUpdate',
+  TODAY_PRESS = 'todayPress',
+  DAY_PRESS = 'dayPress',
+  ARROW_PRESS = 'arrowPress',
+  WEEK_ARROW_PRESS = 'weekArrowPress',
+  LIST_DRAG = 'listDrag',
+  PAGE_SCROLL = 'pageScroll',
+  WEEK_SCROLL = 'weekScroll'
+}
+```
+
+### CalendarNavigationTypes
+
+Navigation types for disabling auto-selection.
+
+```typescript
+enum CalendarNavigationTypes {
+  AGENDA_SCROLL = 'listDrag',
+  MONTH_SCROLL = 'pageScroll',
+  WEEK_SCROLL = 'weekScroll',
+  MONTH_ARROWS = 'arrowPress',
+  WEEK_ARROWS = 'weekArrowPress',
+  TODAY_PRESS = 'todayPress'
+}
+```
+
+## Usage with TypeScript
+
+### Typed component props
+
+```typescript
+import React from 'react';
+import { Calendar, DateData, MarkedDates } from 'react-native-calendars';
+
+interface MyCalendarProps {
+  initialDate: string;
+  onDateSelect: (date: DateData) => void;
+}
+
+const MyCalendar: React.FC<MyCalendarProps> = ({
+  initialDate,
+  onDateSelect
+}) => {
+  const markedDates: MarkedDates = {
+    [initialDate]: { selected: true }
+  };
+
+  return (
+    <Calendar
+      current={initialDate}
+      onDayPress={onDateSelect}
+      markedDates={markedDates}
+    />
+  );
+};
+```
+
+### Typed context usage
+
+```typescript
+import React, { useContext } from 'react';
+import { CalendarContext, CalendarContextProps } from 'react-native-calendars';
+
+const MyComponent: React.FC = () => {
+  const context = useContext<CalendarContextProps>(CalendarContext);
+
+  const handlePress = () => {
+    context.setDate('2024-03-15', 'dayPress');
+  };
+
+  return (
+    <Text onPress={handlePress}>
+      Current: {context.date}
+    </Text>
+  );
+};
+```
+
+### Typed theme
+
+```typescript
+import { Theme } from 'react-native-calendars';
+
+const customTheme: Theme = {
+  backgroundColor: '#ffffff',
+  calendarBackground: '#ffffff',
+  textSectionTitleColor: '#b6c1cd',
+  selectedDayBackgroundColor: '#00adf5',
+  selectedDayTextColor: '#ffffff',
+  todayTextColor: '#00adf5',
+  dayTextColor: '#2d4150',
+  textDisabledColor: '#d9e1e8',
+  arrowColor: 'orange',
+  monthTextColor: 'blue'
+};
+```
+
+## Related
+
+- [CalendarProvider](/api/calendar-provider) - Context provider component
+- [CalendarContext](/api/calendar-context) - Calendar context
+- [Calendar](/api/calendar) - Basic calendar component
+- [Agenda](/api/agenda) - Agenda component

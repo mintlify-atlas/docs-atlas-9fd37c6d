@@ -1,0 +1,557 @@
+---
+title: Theming
+description: Customize the appearance of React Native Calendars with themes
+---
+
+React Native Calendars provides a comprehensive theming system that allows you to customize colors, fonts, sizes, and even component stylesheets.
+
+## Basic theming
+
+Pass a `theme` object to any calendar component to customize its appearance:
+
+```tsx
+<Calendar
+  theme={{
+    backgroundColor: '#ffffff',
+    calendarBackground: '#ffffff',
+    textSectionTitleColor: '#b6c1cd',
+    selectedDayBackgroundColor: '#00adf5',
+    selectedDayTextColor: '#ffffff',
+    todayTextColor: '#00adf5',
+    dayTextColor: '#2d4150',
+    textDisabledColor: '#d9e1e8'
+  }}
+/>
+```
+
+## Theme interface
+
+The complete theme interface from the source code:
+
+```typescript
+export interface Theme {
+  // Background colors
+  calendarBackground?: string;
+  backgroundColor?: string; // Deprecated, use calendarBackground
+  
+  // Text colors
+  textSectionTitleColor?: string;
+  textSectionTitleDisabledColor?: string;
+  dayTextColor?: string;
+  selectedDayTextColor?: string;
+  monthTextColor?: string;
+  todayTextColor?: string;
+  textDisabledColor?: string;
+  textInactiveColor?: string;
+  
+  // Day styling
+  selectedDayBackgroundColor?: string;
+  todayBackgroundColor?: string;
+  
+  // Arrow styling
+  arrowColor?: string;
+  disabledArrowColor?: string;
+  arrowStyle?: ViewStyle;
+  arrowHeight?: number;
+  arrowWidth?: number;
+  
+  // Indicator
+  indicatorColor?: string;
+  
+  // Dot styling
+  dotColor?: string;
+  selectedDotColor?: string;
+  disabledDotColor?: string;
+  inactiveDotColor?: string;
+  todayDotColor?: string;
+  dotStyle?: object;
+  
+  // Font families
+  textDayFontFamily?: TextStyle['fontFamily'];
+  textMonthFontFamily?: TextStyle['fontFamily'];
+  textDayHeaderFontFamily?: TextStyle['fontFamily'];
+  todayButtonFontFamily?: TextStyle['fontFamily'];
+  
+  // Font weights
+  textDayFontWeight?: TextStyle['fontWeight'];
+  textMonthFontWeight?: TextStyle['fontWeight'];
+  textDayHeaderFontWeight?: TextStyle['fontWeight'];
+  todayButtonFontWeight?: TextStyle['fontWeight'];
+  
+  // Font sizes
+  textDayFontSize?: number;
+  textMonthFontSize?: number;
+  textDayHeaderFontSize?: number;
+  todayButtonFontSize?: number;
+  
+  // Text styling
+  textDayStyle?: TextStyle;
+  
+  // Today button
+  todayButtonTextColor?: string;
+  todayButtonPosition?: string;
+  
+  // Agenda
+  agendaDayTextColor?: string;
+  agendaDayNumColor?: string;
+  agendaTodayColor?: string;
+  agendaKnobColor?: string;
+  
+  // Timeline
+  timelineContainer?: object;
+  contentStyle?: ViewStyle;
+  event?: object;
+  eventTitle?: object;
+  eventSummary?: object;
+  eventTimes?: object;
+  line?: object;
+  verticalLine?: object;
+  nowIndicatorLine?: object;
+  nowIndicatorKnob?: object;
+  timeLabel?: object;
+  
+  // Spacing
+  weekVerticalMargin?: number;
+  
+  // Reservations
+  reservationsBackgroundColor?: string;
+  
+  // Advanced: Custom stylesheets
+  stylesheet?: {
+    calendar?: {
+      main?: object;
+      header?: object;
+    };
+    day?: {
+      basic?: object;
+      period?: object;
+    };
+    dot?: object;
+    marking?: object;
+    'calendar-list'?: {
+      main?: object;
+    };
+    agenda?: {
+      main?: object;
+      list?: object;
+    };
+    expandable?: {
+      main?: object;
+    };
+  };
+}
+```
+
+## Theme properties
+
+### Colors
+
+<Tabs>
+  <Tab title="Background colors">
+    <ParamField path="calendarBackground" type="string">
+      Background color of the calendar
+    </ParamField>
+    
+    <ParamField path="selectedDayBackgroundColor" type="string">
+      Background color for selected dates
+    </ParamField>
+    
+    <ParamField path="todayBackgroundColor" type="string">
+      Background color for today's date
+    </ParamField>
+    
+    <ParamField path="reservationsBackgroundColor" type="string">
+      Background color for the reservations section in Agenda
+    </ParamField>
+  </Tab>
+  
+  <Tab title="Text colors">
+    <ParamField path="dayTextColor" type="string">
+      Color for regular day numbers
+    </ParamField>
+    
+    <ParamField path="selectedDayTextColor" type="string">
+      Text color for selected dates
+    </ParamField>
+    
+    <ParamField path="todayTextColor" type="string">
+      Text color for today's date
+    </ParamField>
+    
+    <ParamField path="textDisabledColor" type="string">
+      Text color for disabled dates
+    </ParamField>
+    
+    <ParamField path="textInactiveColor" type="string">
+      Text color for inactive dates (dates outside current month)
+    </ParamField>
+    
+    <ParamField path="monthTextColor" type="string">
+      Color for the month name in the header
+    </ParamField>
+    
+    <ParamField path="textSectionTitleColor" type="string">
+      Color for day names (Mon, Tue, etc.)
+    </ParamField>
+    
+    <ParamField path="textSectionTitleDisabledColor" type="string">
+      Color for disabled day names
+    </ParamField>
+  </Tab>
+  
+  <Tab title="Accent colors">
+    <ParamField path="arrowColor" type="string">
+      Color of navigation arrows
+    </ParamField>
+    
+    <ParamField path="disabledArrowColor" type="string">
+      Color of disabled navigation arrows
+    </ParamField>
+    
+    <ParamField path="indicatorColor" type="string">
+      Color of the loading indicator
+    </ParamField>
+    
+    <ParamField path="dotColor" type="string">
+      Default color for marking dots
+    </ParamField>
+    
+    <ParamField path="selectedDotColor" type="string">
+      Dot color when date is selected
+    </ParamField>
+    
+    <ParamField path="disabledDotColor" type="string">
+      Dot color for disabled dates
+    </ParamField>
+    
+    <ParamField path="inactiveDotColor" type="string">
+      Dot color for inactive dates
+    </ParamField>
+    
+    <ParamField path="todayDotColor" type="string">
+      Dot color for today's date
+    </ParamField>
+  </Tab>
+</Tabs>
+
+### Typography
+
+<Tabs>
+  <Tab title="Font families">
+    <ParamField path="textDayFontFamily" type="string">
+      Font family for day numbers
+    </ParamField>
+    
+    <ParamField path="textMonthFontFamily" type="string">
+      Font family for month name
+    </ParamField>
+    
+    <ParamField path="textDayHeaderFontFamily" type="string">
+      Font family for day names (Mon, Tue, etc.)
+    </ParamField>
+    
+    <ParamField path="todayButtonFontFamily" type="string">
+      Font family for the today button
+    </ParamField>
+  </Tab>
+  
+  <Tab title="Font weights">
+    <ParamField path="textDayFontWeight" type="TextStyle['fontWeight']">
+      Font weight for day numbers
+    </ParamField>
+    
+    <ParamField path="textMonthFontWeight" type="TextStyle['fontWeight']">
+      Font weight for month name
+    </ParamField>
+    
+    <ParamField path="textDayHeaderFontWeight" type="TextStyle['fontWeight']">
+      Font weight for day names
+    </ParamField>
+    
+    <ParamField path="todayButtonFontWeight" type="TextStyle['fontWeight']">
+      Font weight for the today button
+    </ParamField>
+  </Tab>
+  
+  <Tab title="Font sizes">
+    <ParamField path="textDayFontSize" type="number">
+      Font size for day numbers
+    </ParamField>
+    
+    <ParamField path="textMonthFontSize" type="number">
+      Font size for month name
+    </ParamField>
+    
+    <ParamField path="textDayHeaderFontSize" type="number">
+      Font size for day names
+    </ParamField>
+    
+    <ParamField path="todayButtonFontSize" type="number">
+      Font size for the today button
+    </ParamField>
+  </Tab>
+</Tabs>
+
+### Styling
+
+<ParamField path="textDayStyle" type="TextStyle">
+  Complete text style object for day numbers
+</ParamField>
+
+<ParamField path="dotStyle" type="object">
+  Style object for marking dots
+</ParamField>
+
+<ParamField path="arrowStyle" type="ViewStyle">
+  Style object for navigation arrows
+</ParamField>
+
+<ParamField path="arrowHeight" type="number">
+  Height of navigation arrows
+</ParamField>
+
+<ParamField path="arrowWidth" type="number">
+  Width of navigation arrows
+</ParamField>
+
+<ParamField path="weekVerticalMargin" type="number">
+  Vertical margin for week rows
+</ParamField>
+
+## Example themes
+
+### Dark theme
+
+```tsx
+const darkTheme = {
+  calendarBackground: '#1a1a1a',
+  textSectionTitleColor: '#b6c1cd',
+  textSectionTitleDisabledColor: '#555555',
+  selectedDayBackgroundColor: '#00adf5',
+  selectedDayTextColor: '#ffffff',
+  todayTextColor: '#00adf5',
+  dayTextColor: '#ffffff',
+  textDisabledColor: '#555555',
+  monthTextColor: '#ffffff',
+  indicatorColor: '#00adf5',
+  dotColor: '#00adf5',
+  selectedDotColor: '#ffffff',
+  arrowColor: '#ffffff',
+  disabledArrowColor: '#555555'
+};
+
+<Calendar theme={darkTheme} />
+```
+
+### Custom font theme
+
+```tsx
+const customFontTheme = {
+  textDayFontFamily: 'HelveticaNeue',
+  textMonthFontFamily: 'HelveticaNeue',
+  textDayHeaderFontFamily: 'HelveticaNeue',
+  textDayFontSize: 18,
+  textMonthFontSize: 16,
+  textDayHeaderFontSize: 12,
+  textDayFontWeight: '500',
+  textMonthFontWeight: 'bold',
+  textDayHeaderFontWeight: 'normal',
+  textDayStyle: {
+    marginTop: Platform.OS === 'android' ? 2 : 4
+  }
+};
+
+<Calendar theme={customFontTheme} />
+```
+
+### Colorful accent theme
+
+```tsx
+const colorfulTheme = {
+  calendarBackground: '#f2f7f7',
+  selectedDayBackgroundColor: '#00AAAF',
+  selectedDayTextColor: 'white',
+  todayTextColor: '#af0078',
+  dayTextColor: '#00AAAF',
+  textSectionTitleColor: 'black',
+  arrowColor: 'black',
+  monthTextColor: 'black',
+  dotColor: '#00AAAF',
+  selectedDotColor: 'white',
+  disabledDotColor: 'grey'
+};
+
+<Calendar theme={colorfulTheme} />
+```
+
+## Advanced: Custom stylesheets
+
+For deep customization, you can override component stylesheets:
+
+```tsx
+<Calendar
+  theme={{
+    stylesheet: {
+      calendar: {
+        header: {
+          week: {
+            marginTop: 30,
+            marginHorizontal: 12,
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+          }
+        }
+      }
+    }
+  }}
+/>
+```
+
+### Available stylesheets
+
+<Accordion title="calendar">
+  Customize the main calendar component:
+  - `main`: Container styles
+  - `header`: Header section styles
+</Accordion>
+
+<Accordion title="day">
+  Customize day components:
+  - `basic`: Basic day cell styles
+  - `period`: Period marking day styles
+</Accordion>
+
+<Accordion title="dot">
+  Customize dot marking styles
+</Accordion>
+
+<Accordion title="marking">
+  Customize marking container styles
+</Accordion>
+
+<Accordion title="calendar-list">
+  Customize the CalendarList component:
+  - `main`: Container styles
+</Accordion>
+
+<Accordion title="agenda">
+  Customize the Agenda component:
+  - `main`: Container styles
+  - `list`: List section styles
+</Accordion>
+
+<Accordion title="expandable">
+  Customize the ExpandableCalendar component:
+  - `main`: Container styles
+</Accordion>
+
+<Warning>
+  Custom stylesheets override default styles completely. Make sure to include all necessary styles when using this feature.
+</Warning>
+
+## Theme inheritance
+
+Themes are passed down from parent components to child components. This means:
+
+- Setting a theme on `CalendarProvider` applies it to all nested calendar components
+- Individual components can override the inherited theme
+- You can mix global and local theme customization
+
+```tsx
+<CalendarProvider theme={globalTheme}>
+  <ExpandableCalendar /> {/* Uses globalTheme */}
+  <WeekCalendar theme={weekTheme} /> {/* Overrides with weekTheme */}
+</CalendarProvider>
+```
+
+## Agenda-specific theming
+
+The Agenda component has additional theme properties:
+
+```tsx
+<Agenda
+  theme={{
+    agendaDayTextColor: '#2d4150',
+    agendaDayNumColor: '#2d4150',
+    agendaTodayColor: '#00adf5',
+    agendaKnobColor: '#00adf5',
+    reservationsBackgroundColor: '#f3f3f3'
+  }}
+/>
+```
+
+<ParamField path="agendaDayTextColor" type="string">
+  Color for day names in the agenda
+</ParamField>
+
+<ParamField path="agendaDayNumColor" type="string">
+  Color for day numbers in the agenda
+</ParamField>
+
+<ParamField path="agendaTodayColor" type="string">
+  Color for today's date in the agenda
+</ParamField>
+
+<ParamField path="agendaKnobColor" type="string">
+  Color of the expandable knob
+</ParamField>
+
+## Timeline-specific theming
+
+The Timeline component supports additional theme properties:
+
+```tsx
+<Timeline
+  theme={{
+    timelineContainer: { backgroundColor: '#f3f3f3' },
+    nowIndicatorLine: { backgroundColor: 'red' },
+    nowIndicatorKnob: { backgroundColor: 'red' },
+    verticalLine: { backgroundColor: '#e0e0e0' }
+  }}
+/>
+```
+
+## Best practices
+
+<Accordion title="Create reusable themes">
+  Define themes as constants and reuse them across your app:
+  
+  ```tsx
+  // theme.ts
+  export const lightTheme = { ... };
+  export const darkTheme = { ... };
+  
+  // MyComponent.tsx
+  import { lightTheme } from './theme';
+  <Calendar theme={lightTheme} />
+  ```
+</Accordion>
+
+<Accordion title="Use theme prop consistently">
+  Apply the same theme to all calendar components in your app for a consistent look:
+  
+  ```tsx
+  const theme = useCalendarTheme(); // Custom hook
+  
+  <Calendar theme={theme} />
+  <CalendarList theme={theme} />
+  <Agenda theme={theme} />
+  ```
+</Accordion>
+
+<Accordion title="Respect system theme">
+  Detect and apply light/dark theme based on system preferences:
+  
+  ```tsx
+  import { useColorScheme } from 'react-native';
+  
+  const colorScheme = useColorScheme();
+  const theme = colorScheme === 'dark' ? darkTheme : lightTheme;
+  
+  <Calendar theme={theme} />
+  ```
+</Accordion>
+
+<Note>
+  The `backgroundColor` property is deprecated. Use `calendarBackground` instead for better clarity.
+</Note>

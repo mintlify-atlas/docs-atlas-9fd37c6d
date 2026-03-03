@@ -1,0 +1,424 @@
+---
+title: Agenda component example
+description: Build an event agenda view with calendar integration and dynamic item loading
+---
+
+The `Agenda` component combines a calendar with a scrollable event list, perfect for displaying scheduled items and appointments. It features a collapsible calendar and efficient data loading.
+
+## Basic agenda setup
+
+Create a simple agenda with dynamic item loading:
+
+```javascript
+import React, {Component} from 'react';
+import {Alert, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {Agenda} from 'react-native-calendars';
+
+export default class AgendaScreen extends Component {
+  state = {
+    items: undefined
+  };
+
+  render() {
+    return (
+      <Agenda
+        items={this.state.items}
+        loadItemsForMonth={this.loadItems}
+        selected={'2024-11-06'}
+        renderItem={this.renderItem}
+        renderEmptyDate={this.renderEmptyDate}
+        rowHasChanged={this.rowHasChanged}
+        showClosingKnob={true}
+      />
+    );
+  }
+
+  loadItems = (day) => {
+    const items = this.state.items || {};
+
+    setTimeout(() => {
+      for (let i = -15; i < 85; i++) {
+        const time = day.timestamp + i * 24 * 60 * 60 * 1000;
+        const strTime = this.timeToString(time);
+
+        if (!items[strTime]) {
+          items[strTime] = [];
+          
+          const numItems = Math.floor(Math.random() * 3 + 1);
+          for (let j = 0; j < numItems; j++) {
+            items[strTime].push({
+              name: 'Item for ' + strTime + ' #' + j,
+              height: Math.max(50, Math.floor(Math.random() * 150)),
+              day: strTime
+            });
+          }
+        }
+      }
+      
+      const newItems = {};
+      Object.keys(items).forEach(key => {
+        newItems[key] = items[key];
+      });
+      this.setState({
+        items: newItems
+      });
+    }, 1000);
+  };
+
+  renderItem = (reservation, isFirst) => {
+    const fontSize = isFirst ? 16 : 14;
+    const color = isFirst ? 'black' : '#43515c';
+
+    return (
+      <TouchableOpacity
+        style={[styles.item, {height: reservation.height}]}
+        onPress={() => Alert.alert(reservation.name)}
+      >
+        <Text style={{fontSize, color}}>{reservation.name}</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  renderEmptyDate = () => {
+    return (
+      <View style={styles.emptyDate}>
+        <Text>This is empty date!</Text>
+      </View>
+    );
+  };
+
+  rowHasChanged = (r1, r2) => {
+    return r1.name !== r2.name;
+  };
+
+  timeToString(time) {
+    const date = new Date(time);
+    return date.toISOString().split('T')[0];
+  }
+}
+
+const styles = StyleSheet.create({
+  item: {
+    backgroundColor: 'white',
+    flex: 1,
+    borderRadius: 5,
+    padding: 10,
+    marginRight: 10,
+    marginTop: 17
+  },
+  emptyDate: {
+    height: 15,
+    flex: 1,
+    paddingTop: 30
+  }
+});
+```
+
+<Info>
+The `loadItemsForMonth` callback is triggered when a new month becomes visible, allowing you to load items on-demand.
+</Info>
+
+## Agenda with marked dates
+
+Combine agenda items with date marking:
+
+```javascript
+import React, {Component} from 'react';
+import {Agenda} from 'react-native-calendars';
+
+export default class AgendaScreen extends Component {
+  render() {
+    return (
+      <Agenda
+        items={this.state.items}
+        loadItemsForMonth={this.loadItems}
+        selected={'2017-05-16'}
+        renderItem={this.renderItem}
+        renderEmptyDate={this.renderEmptyDate}
+        rowHasChanged={this.rowHasChanged}
+        showClosingKnob={true}
+        markingType={'period'}
+        markedDates={{
+          '2017-05-08': {textColor: '#43515c'},
+          '2017-05-09': {textColor: '#43515c'},
+          '2017-05-14': {startingDay: true, endingDay: true, color: 'blue'},
+          '2017-05-21': {startingDay: true, color: 'blue'},
+          '2017-05-22': {endingDay: true, color: 'gray'},
+          '2017-05-24': {startingDay: true, color: 'gray'},
+          '2017-05-25': {color: 'gray'},
+          '2017-05-26': {endingDay: true, color: 'gray'}
+        }}
+      />
+    );
+  }
+}
+```
+
+<Tip>
+You can use any marking type (`simple`, `multi-dot`, `period`, `multi-period`, `custom`) with the Agenda component.
+</Tip>
+
+## Custom theme for agenda
+
+Style your agenda with custom colors:
+
+```javascript
+import React from 'react';
+import {Agenda} from 'react-native-calendars';
+
+const App = () => {
+  return (
+    <Agenda
+      items={items}
+      loadItemsForMonth={loadItems}
+      selected={'2024-11-06'}
+      renderItem={renderItem}
+      renderEmptyDate={renderEmptyDate}
+      theme={{
+        calendarBackground: '#ffffff',
+        agendaKnobColor: '#0066cc',
+        selectedDayBackgroundColor: '#0066cc',
+        selectedDayTextColor: '#ffffff',
+        todayTextColor: '#0066cc',
+        dayTextColor: '#2d4150',
+        textDisabledColor: '#d9e1e8',
+        dotColor: '#0066cc',
+        agendaDayTextColor: '#0066cc',
+        agendaDayNumColor: '#0066cc',
+        agendaTodayColor: '#ff0000'
+      }}
+    />
+  );
+};
+
+export default App;
+```
+
+## Data structure
+
+The Agenda component expects items in this format:
+
+```javascript
+const items = {
+  '2024-11-06': [
+    {
+      name: 'Meeting with team',
+      height: 80,
+      day: '2024-11-06'
+    },
+    {
+      name: 'Lunch appointment',
+      height: 60,
+      day: '2024-11-06'
+    }
+  ],
+  '2024-11-07': [
+    {
+      name: 'Conference call',
+      height: 100,
+      day: '2024-11-07'
+    }
+  ],
+  '2024-11-08': [], // Empty day
+  // Date not included means not loaded yet
+};
+```
+
+<Note>
+Dates with an empty array `[]` are rendered as empty dates. Dates not included in the object are considered not yet loaded.
+</Note>
+
+## Custom day rendering
+
+Customize how days are rendered in the calendar:
+
+```javascript
+import React from 'react';
+import {View, Text, StyleSheet} from 'react-native';
+import {Agenda} from 'react-native-calendars';
+
+const App = () => {
+  const renderDay = (day) => {
+    if (day) {
+      return <Text style={styles.customDay}>{day.getDay()}</Text>;
+    }
+    return <View style={styles.dayItem}/>;
+  };
+
+  return (
+    <Agenda
+      items={items}
+      loadItemsForMonth={loadItems}
+      renderItem={renderItem}
+      renderDay={renderDay}
+    />
+  );
+};
+
+const styles = StyleSheet.create({
+  customDay: {
+    margin: 10,
+    fontSize: 24,
+    color: 'green'
+  },
+  dayItem: {
+    marginLeft: 34
+  }
+});
+
+export default App;
+```
+
+## Agenda key props
+
+<CodeGroup>
+
+```javascript Core Props
+<Agenda
+  // Items to display {[date]: [items]}
+  items={items}
+  
+  // Callback when month becomes visible
+  loadItemsForMonth={(day) => {}}
+  
+  // Initially selected day
+  selected={'2024-11-06'}
+  
+  // Render function for agenda items
+  renderItem={(item, isFirst) => <View />}
+  
+  // Render function for empty dates
+  renderEmptyDate={() => <View />}
+  
+  // Callback to determine if row changed
+  rowHasChanged={(r1, r2) => r1 !== r2}
+/>
+```
+
+```javascript Calendar Props
+<Agenda
+  // All Calendar props are supported
+  markingType={'period'}
+  markedDates={markedDates}
+  theme={theme}
+  firstDay={1}
+  hideExtraDays={false}
+  monthFormat={'yyyy-MM'}
+/>
+```
+
+```javascript UI Props
+<Agenda
+  // Show/hide knob
+  hideKnob={false}
+  
+  // Show closing knob when open
+  showClosingKnob={true}
+  
+  // Show only items for selected day
+  showOnlySelectedDayItems={false}
+/>
+```
+
+</CodeGroup>
+
+## Callbacks
+
+The Agenda component provides several useful callbacks:
+
+```javascript
+<Agenda
+  // Called when calendar is opened/closed
+  onCalendarToggled={(enabled) => {
+    console.log('Calendar is', enabled ? 'open' : 'closed');
+  }}
+  
+  // Called when day changes while scrolling
+  onDayChange={(day) => {
+    console.log('Day changed to:', day.dateString);
+  }}
+  
+  // Called when day is pressed
+  onDayPress={(day) => {
+    console.log('Day pressed:', day.dateString);
+  }}
+/>
+```
+
+## Custom item rendering
+
+Create rich, interactive agenda items:
+
+```javascript
+import React from 'react';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+
+const renderItem = (item, isFirst) => {
+  return (
+    <TouchableOpacity style={styles.item}>
+      <View style={styles.itemContent}>
+        <Text style={styles.itemTitle}>{item.name}</Text>
+        <Text style={styles.itemTime}>{item.time}</Text>
+        <Text style={styles.itemDescription}>{item.description}</Text>
+      </View>
+      {item.attendees && (
+        <View style={styles.attendees}>
+          {item.attendees.map((attendee, index) => (
+            <Text key={index} style={styles.attendee}>{attendee}</Text>
+          ))}
+        </View>
+      )}
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  item: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 16,
+    marginRight: 10,
+    marginTop: 17,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3
+  },
+  itemContent: {
+    marginBottom: 8
+  },
+  itemTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#212529',
+    marginBottom: 4
+  },
+  itemTime: {
+    fontSize: 14,
+    color: '#6c757d',
+    marginBottom: 4
+  },
+  itemDescription: {
+    fontSize: 14,
+    color: '#495057'
+  },
+  attendees: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 8
+  },
+  attendee: {
+    fontSize: 12,
+    color: '#0066cc',
+    marginRight: 8,
+    padding: 4,
+    backgroundColor: '#e7f3ff',
+    borderRadius: 4
+  }
+});
+```
+
+<Tip>
+The `isFirst` parameter in `renderItem` indicates if this is the first item of the day, useful for different styling.
+</Tip>

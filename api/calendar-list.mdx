@@ -1,0 +1,259 @@
+---
+title: CalendarList
+description: Horizontal or vertical scrollable calendar list component for displaying multiple months
+---
+
+CalendarList extends the Calendar component to display multiple months in a scrollable list, supporting both horizontal and vertical scrolling.
+
+## Basic usage
+
+```jsx
+import { CalendarList } from 'react-native-calendars';
+
+<CalendarList
+  onDayPress={(day) => console.log('selected day', day)}
+  markedDates={{
+    '2023-05-16': {selected: true}
+  }}
+/>
+```
+
+## Props
+
+CalendarList extends all [Calendar props](/api/calendar) with additional list-specific properties.
+
+### Scroll configuration
+
+<ParamField path="pastScrollRange" type="number" default="50">
+  Maximum amount of months allowed to scroll to the past.
+</ParamField>
+
+<ParamField path="futureScrollRange" type="number" default="50">
+  Maximum amount of months allowed to scroll to the future.
+</ParamField>
+
+<ParamField path="scrollEnabled" type="boolean" default="true">
+  Enable or disable scrolling of the calendar list.
+</ParamField>
+
+<ParamField path="showScrollIndicator" type="boolean" default="false">
+  Enable or disable vertical/horizontal scroll indicator.
+</ParamField>
+
+<ParamField path="animateScroll" type="boolean" default="false">
+  Whether to animate the auto month scroll.
+</ParamField>
+
+<ParamField path="scrollsToTop" type="boolean" default="false">
+  Enable scrolling to top when tapping on status bar (iOS only).
+</ParamField>
+
+<ParamField path="nestedScrollEnabled" type="boolean" default="true">
+  Enable nested scrolling for Android.
+</ParamField>
+
+### Layout configuration
+
+<ParamField path="horizontal" type="boolean" default="false">
+  Whether to render the calendar list horizontally. When `true`, pagination should be disabled.
+</ParamField>
+
+<ParamField path="pagingEnabled" type="boolean">
+  Enable paging on horizontal calendar list.
+</ParamField>
+
+<ParamField path="calendarWidth" type="number">
+  Used when calendar scroll is horizontal. Default is device width. Pagination should be disabled when using this prop.
+</ParamField>
+
+<ParamField path="calendarHeight" type="number" default="360">
+  Dynamic calendar height for vertical scrolling.
+</ParamField>
+
+<ParamField path="calendarStyle" type="ViewStyle">
+  Style for the List item (the individual calendar).
+  
+  ```jsx
+  calendarStyle={{
+    borderWidth: 1,
+    borderColor: 'gray',
+    height: 350
+  }}
+  ```
+</ParamField>
+
+<ParamField path="staticHeader" type="boolean">
+  Use static header that will not scroll with the list (horizontal only).
+</ParamField>
+
+### FlatList props
+
+CalendarList also supports the following FlatList props:
+
+<ParamField path="removeClippedSubviews" type="boolean">
+  Remove clipped subviews to improve performance.
+</ParamField>
+
+<ParamField path="contentContainerStyle" type="ViewStyle">
+  Style for the FlatList content container.
+</ParamField>
+
+<ParamField path="keyExtractor" type="(item: any, index: number) => string">
+  Used to extract a unique key for a given item at the specified index.
+</ParamField>
+
+<ParamField path="keyboardShouldPersistTaps" type="'never' | 'always' | 'handled'">
+  Determines when the keyboard should stay visible after a tap.
+</ParamField>
+
+<ParamField path="onEndReachedThreshold" type="number">
+  How far from the end (in units of visible length) the bottom edge of the list must be from the end of the content to trigger the `onEndReached` callback.
+</ParamField>
+
+<ParamField path="onEndReached" type="(info: {distanceFromEnd: number}) => void">
+  Called once when the scroll position gets within `onEndReachedThreshold` of the rendered content.
+</ParamField>
+
+### Scroll event handlers
+
+<ParamField path="onScrollBeginDrag" type="(event: NativeSyntheticEvent<NativeScrollEvent>) => void">
+  Called when the user begins dragging the calendar list.
+</ParamField>
+
+<ParamField path="onScrollEndDrag" type="(event: NativeSyntheticEvent<NativeScrollEvent>) => void">
+  Called when the user stops dragging the calendar list.
+</ParamField>
+
+<ParamField path="onMomentumScrollBegin" type="(event: NativeSyntheticEvent<NativeScrollEvent>) => void">
+  Called when the momentum scroll starts.
+</ParamField>
+
+<ParamField path="onMomentumScrollEnd" type="(event: NativeSyntheticEvent<NativeScrollEvent>) => void">
+  Called when the momentum scroll stops.
+</ParamField>
+
+### Other props
+
+<ParamField path="onLayout" type="(event: LayoutChangeEvent) => void">
+  Invoked on mount and layout changes.
+</ParamField>
+
+<ParamField path="onHeaderLayout" type="(event: LayoutChangeEvent) => void">
+  Callback for header layout events.
+</ParamField>
+
+## Imperative methods
+
+You can call these methods on the CalendarList ref:
+
+### scrollToDay
+
+```typescript
+scrollToDay(date: XDate | string, offset: number, animated: boolean): void
+```
+
+Scroll to a specific day with optional offset and animation.
+
+```jsx
+import { useRef } from 'react';
+import { CalendarList } from 'react-native-calendars';
+
+function MyCalendar() {
+  const calendarRef = useRef(null);
+
+  const scrollToToday = () => {
+    calendarRef.current?.scrollToDay(new Date(), 0, true);
+  };
+
+  return <CalendarList ref={calendarRef} />;
+}
+```
+
+### scrollToMonth
+
+```typescript
+scrollToMonth(date: XDate | string): void
+```
+
+Scroll to a specific month.
+
+```jsx
+const scrollToNextMonth = () => {
+  const nextMonth = new Date();
+  nextMonth.setMonth(nextMonth.getMonth() + 1);
+  calendarRef.current?.scrollToMonth(nextMonth);
+};
+```
+
+## Examples
+
+### Horizontal calendar list
+
+```jsx
+<CalendarList
+  horizontal
+  pagingEnabled
+  calendarWidth={320}
+  onDayPress={(day) => console.log('selected day', day)}
+/>
+```
+
+### Vertical calendar list with custom range
+
+```jsx
+<CalendarList
+  pastScrollRange={12}
+  futureScrollRange={12}
+  scrollEnabled={true}
+  showScrollIndicator={true}
+  onDayPress={(day) => console.log('selected day', day)}
+/>
+```
+
+### Calendar list with static header
+
+```jsx
+<CalendarList
+  horizontal
+  pagingEnabled
+  staticHeader
+  calendarStyle={{
+    borderWidth: 1,
+    borderColor: 'gray',
+    margin: 10
+  }}
+/>
+```
+
+### Scrollable calendar with custom styling
+
+```jsx
+<CalendarList
+  calendarHeight={390}
+  calendarStyle={{
+    backgroundColor: '#f5f5f5',
+    paddingBottom: 20
+  }}
+  theme={{
+    backgroundColor: '#ffffff',
+    calendarBackground: '#ffffff',
+    selectedDayBackgroundColor: '#00adf5',
+    selectedDayTextColor: '#ffffff'
+  }}
+/>
+```
+
+## Notes
+
+<Note>
+  When using `horizontal` mode with custom `calendarWidth`, make sure to disable `pagingEnabled` or set it explicitly to control the scrolling behavior.
+</Note>
+
+<Warning>
+  Setting very large values for `pastScrollRange` and `futureScrollRange` can impact performance, especially on lower-end devices.
+</Warning>
+
+## Related components
+
+- [Calendar](/api/calendar) - Base calendar component
+- [ExpandableCalendar](/api/expandable-calendar) - Expandable calendar with week view

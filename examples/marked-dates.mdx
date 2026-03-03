@@ -1,0 +1,352 @@
+---
+title: Marked dates examples
+description: Learn how to mark dates with dots, periods, multi-dots, and custom styles
+---
+
+The Calendar component supports various marking types to highlight dates with different visual styles. You can mark events, date ranges, and apply custom styling.
+
+## Simple dot marking
+
+Mark dates with a colored dot below the day number:
+
+```javascript
+import React, {useState} from 'react';
+import {Calendar} from 'react-native-calendars';
+
+const App = () => {
+  const [selected, setSelected] = useState('2024-11-06');
+
+  return (
+    <Calendar
+      current={'2024-11-06'}
+      firstDay={1}
+      hideExtraDays
+      markedDates={{
+        '2024-11-12': {selected: true, marked: true, disableTouchEvent: true},
+        '2024-11-13': {selected: true, marked: true, dotColor: 'red'},
+        '2024-11-14': {marked: true, dotColor: 'red', disableTouchEvent: true},
+        '2024-11-15': {marked: true},
+        '2024-11-16': {disabled: true, activeOpacity: 0, disableTouchEvent: false}
+      }}
+      hideArrows={true}
+    />
+  );
+};
+
+export default App;
+```
+
+<Tip>
+Use `disableTouchEvent` to prevent user interaction with specific marked dates.
+</Tip>
+
+## Multi-dot marking
+
+Display multiple dots on a single date to represent multiple events:
+
+```javascript
+import React from 'react';
+import {Calendar} from 'react-native-calendars';
+
+const App = () => {
+  return (
+    <Calendar
+      current={'2024-11-06'}
+      markingType={'multi-dot'}
+      markedDates={{
+        '2024-11-08': {
+          selected: true,
+          dots: [
+            {key: 'vacation', color: 'blue', selectedDotColor: 'red'},
+            {key: 'massage', color: 'red', selectedDotColor: 'white'}
+          ]
+        },
+        '2024-11-09': {
+          disabled: true,
+          dots: [
+            {key: 'vacation', color: 'green', selectedDotColor: 'red'},
+            {key: 'massage', color: 'red', selectedDotColor: 'green'}
+          ]
+        }
+      }}
+    />
+  );
+};
+
+export default App;
+```
+
+<Info>
+Each dot requires a unique `key` property to distinguish between different event types.
+</Info>
+
+## Period marking
+
+Highlight date ranges with colored backgrounds:
+
+```javascript
+import React from 'react';
+import {Calendar, CalendarUtils} from 'react-native-calendars';
+
+const App = () => {
+  const getDate = (offset) => {
+    const date = new Date('2024-11-06');
+    date.setDate(date.getDate() + offset);
+    return CalendarUtils.getCalendarDateString(date);
+  };
+
+  return (
+    <Calendar
+      current={'2024-11-06'}
+      minDate={getDate(-14)}
+      markingType={'period'}
+      markedDates={{
+        '2024-11-06': {marked: true, dotColor: '#50cebb'},
+        '2024-11-10': {marked: true, dotColor: '#50cebb'},
+        '2024-11-15': {startingDay: true, color: '#50cebb', textColor: 'white'},
+        '2024-11-16': {
+          color: '#70d7c7',
+          customTextStyle: {
+            color: '#FFFAAA',
+            fontWeight: '700'
+          }
+        },
+        '2024-11-17': {color: '#70d7c7', textColor: 'white', marked: true, dotColor: 'white'},
+        '2024-11-18': {color: '#70d7c7', inactive: true, marked: true},
+        '2024-11-19': {
+          endingDay: true,
+          color: '#50cebb',
+          textColor: 'white',
+          customContainerStyle: {
+            borderTopRightRadius: 5,
+            borderBottomRightRadius: 5,
+            backgroundColor: 'green'
+          }
+        },
+        '2024-12-01': {inactive: true, disableTouchEvent: true}
+      }}
+      theme={{
+        textInactiveColor: '#a68a9f',
+        inactiveDotColor: '#a68a9f',
+        textSectionTitleDisabledColor: 'grey',
+        textSectionTitleColor: '#319e8e',
+        arrowColor: '#319e8e'
+      }}
+    />
+  );
+};
+
+export default App;
+```
+
+<Note>
+For period marking, use `startingDay` and `endingDay` properties to define the range boundaries.
+</Note>
+
+## Multi-period marking
+
+Overlay multiple period markings on the same dates:
+
+```javascript
+import React from 'react';
+import {Calendar} from 'react-native-calendars';
+
+const App = () => {
+  return (
+    <Calendar
+      current={'2024-11-06'}
+      markingType={'multi-period'}
+      markedDates={{
+        '2024-11-06': {
+          periods: [
+            {startingDay: true, endingDay: false, color: 'green'},
+            {startingDay: true, endingDay: false, color: 'orange'}
+          ]
+        },
+        '2024-11-07': {
+          periods: [
+            {startingDay: false, endingDay: true, color: 'green'},
+            {startingDay: false, endingDay: true, color: 'orange'},
+            {startingDay: true, endingDay: false, color: 'pink'}
+          ]
+        },
+        '2024-11-09': {
+          periods: [
+            {startingDay: true, endingDay: true, color: 'orange'},
+            {color: 'transparent'},
+            {startingDay: false, endingDay: false, color: 'pink'}
+          ]
+        }
+      }}
+    />
+  );
+};
+
+export default App;
+```
+
+## Custom marking styles
+
+Apply completely custom styles to individual dates:
+
+```javascript
+import React from 'react';
+import {Calendar} from 'react-native-calendars';
+
+const App = () => {
+  return (
+    <Calendar
+      hideExtraDays
+      current={'2024-11-06'}
+      minDate={'2024-11-06'}
+      markingType={'custom'}
+      markedDates={{
+        '2024-11-06': {
+          customStyles: {
+            container: {
+              backgroundColor: 'white',
+              elevation: 2
+            },
+            text: {
+              color: 'red',
+              marginTop: 0
+            }
+          }
+        },
+        '2024-11-14': {
+          selected: true
+        },
+        '2024-11-15': {
+          customStyles: {
+            container: {
+              backgroundColor: 'red',
+              elevation: 4
+            },
+            text: {
+              color: 'white'
+            }
+          }
+        },
+        '2024-11-20': {
+          customStyles: {
+            container: {
+              backgroundColor: 'green'
+            },
+            text: {
+              color: 'white'
+            }
+          }
+        },
+        '2024-11-27': {
+          disabled: true
+        },
+        '2024-12-04': {
+          customStyles: {
+            text: {
+              color: 'black',
+              fontWeight: 'bold'
+            }
+          }
+        },
+        '2024-12-06': {
+          customStyles: {
+            container: {
+              backgroundColor: 'pink',
+              elevation: 4,
+              borderColor: 'purple',
+              borderWidth: 5
+            },
+            text: {
+              marginTop: 3,
+              fontSize: 11,
+              color: 'black'
+            }
+          }
+        }
+      }}
+    />
+  );
+};
+
+export default App;
+```
+
+<Tip>
+Custom marking allows you to apply any React Native style properties to the date container and text.
+</Tip>
+
+## Marking types comparison
+
+<CodeGroup>
+
+```javascript Simple (default)
+markingType={undefined} // or omit this prop
+markedDates={{
+  '2024-11-06': {marked: true, dotColor: 'red'}
+}}
+```
+
+```javascript Multi-dot
+markingType={'multi-dot'}
+markedDates={{
+  '2024-11-06': {
+    dots: [
+      {key: 'vacation', color: 'blue'},
+      {key: 'meeting', color: 'red'}
+    ]
+  }
+}}
+```
+
+```javascript Period
+markingType={'period'}
+markedDates={{
+  '2024-11-06': {startingDay: true, color: 'blue'},
+  '2024-11-07': {color: 'blue'},
+  '2024-11-08': {endingDay: true, color: 'blue'}
+}}
+```
+
+```javascript Multi-period
+markingType={'multi-period'}
+markedDates={{
+  '2024-11-06': {
+    periods: [
+      {startingDay: true, color: 'green'},
+      {startingDay: true, color: 'orange'}
+    ]
+  }
+}}
+```
+
+```javascript Custom
+markingType={'custom'}
+markedDates={{
+  '2024-11-06': {
+    customStyles: {
+      container: {backgroundColor: 'red'},
+      text: {color: 'white'}
+    }
+  }
+}}
+```
+
+</CodeGroup>
+
+## Marking properties reference
+
+```javascript
+// Common properties for all marking types
+{
+  selected: boolean,           // Whether this date is selected
+  marked: boolean,             // Show a dot below the date
+  disabled: boolean,           // Disable date interaction
+  disableTouchEvent: boolean,  // Prevent touch events
+  inactive: boolean,           // Render date as inactive
+  dotColor: string,            // Color of the marking dot
+  selectedColor: string,       // Background color when selected
+  selectedTextColor: string,   // Text color when selected
+  activeOpacity: number,       // Touch opacity (0-1)
+  textColor: string           // Custom text color
+}
+```

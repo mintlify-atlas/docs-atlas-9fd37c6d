@@ -1,0 +1,411 @@
+---
+title: Custom theme examples
+description: Customize calendar appearance with themes, colors, and custom stylesheets
+---
+
+The Calendar component offers extensive theming capabilities to match your app's design. You can customize colors, fonts, and even override internal stylesheets.
+
+## Basic theme customization
+
+Apply a custom color scheme to your calendar:
+
+```javascript
+import React from 'react';
+import {Calendar} from 'react-native-calendars';
+
+const App = () => {
+  return (
+    <Calendar
+      style={{
+        borderWidth: 1,
+        borderColor: 'gray',
+        height: 350
+      }}
+      theme={{
+        backgroundColor: '#ffffff',
+        calendarBackground: '#ffffff',
+        textSectionTitleColor: '#b6c1cd',
+        selectedDayBackgroundColor: '#00adf5',
+        selectedDayTextColor: '#ffffff',
+        todayTextColor: '#00adf5',
+        dayTextColor: '#2d4150',
+        textDisabledColor: '#dd99ee'
+      }}
+    />
+  );
+};
+
+export default App;
+```
+
+## Dark theme example
+
+Create a dark mode calendar with custom styling:
+
+```javascript
+import React from 'react';
+import {Calendar} from 'react-native-calendars';
+
+const App = () => {
+  return (
+    <Calendar
+      current={'2024-11-06'}
+      theme={{
+        calendarBackground: '#333248',
+        textSectionTitleColor: 'white',
+        textSectionTitleDisabledColor: 'pink',
+        dayTextColor: 'red',
+        todayTextColor: 'white',
+        selectedDayTextColor: 'white',
+        monthTextColor: 'white',
+        indicatorColor: 'white',
+        selectedDayBackgroundColor: '#333248',
+        arrowColor: 'white'
+      }}
+      markingType={'period'}
+      markedDates={{
+        '2024-11-04': {disabled: true},
+        '2024-11-07': {textColor: 'pink'},
+        '2024-11-08': {textColor: 'pink'},
+        '2024-11-18': {startingDay: true, color: 'green', endingDay: true},
+        '2024-11-28': {startingDay: true, color: 'green'},
+        '2024-11-29': {endingDay: true, color: 'gray'},
+        '2024-12-01': {startingDay: true, color: 'gray'},
+        '2024-12-02': {color: 'gray'},
+        '2024-12-03': {endingDay: true, color: 'gray'}
+      }}
+    />
+  );
+};
+
+export default App;
+```
+
+<Info>
+Use the `theme` prop to maintain consistent styling across all calendar components in your app.
+</Info>
+
+## Advanced stylesheet override
+
+Override internal component styles using the stylesheet property:
+
+```javascript
+import React from 'react';
+import {Calendar} from 'react-native-calendars';
+
+const App = () => {
+  return (
+    <Calendar
+      current={'2024-11-06'}
+      theme={{
+        calendarBackground: '#333248',
+        textSectionTitleColor: 'white',
+        dayTextColor: 'white',
+        todayTextColor: '#00adf5',
+        selectedDayBackgroundColor: '#00adf5',
+        selectedDayTextColor: 'white',
+        arrowColor: 'white',
+        monthTextColor: 'white',
+        stylesheet: {
+          calendar: {
+            header: {
+              week: {
+                marginTop: 30,
+                marginHorizontal: 12,
+                flexDirection: 'row',
+                justifyContent: 'space-between'
+              }
+            }
+          }
+        }
+      }}
+    />
+  );
+};
+
+export default App;
+```
+
+<Tip>
+The `stylesheet` property allows you to override any internal style in the calendar components.
+</Tip>
+
+## Themed period marking
+
+Combine theme customization with period marking:
+
+```javascript
+import React from 'react';
+import {Calendar} from 'react-native-calendars';
+
+const App = () => {
+  return (
+    <Calendar
+      current={'2024-11-06'}
+      minDate={'2024-10-23'}
+      markingType={'period'}
+      markedDates={{
+        '2024-11-06': {marked: true, dotColor: '#50cebb'},
+        '2024-11-10': {marked: true, dotColor: '#50cebb'},
+        '2024-11-15': {startingDay: true, color: '#50cebb', textColor: 'white'},
+        '2024-11-16': {
+          color: '#70d7c7',
+          customTextStyle: {
+            color: '#FFFAAA',
+            fontWeight: '700'
+          }
+        },
+        '2024-11-17': {color: '#70d7c7', textColor: 'white', marked: true, dotColor: 'white'},
+        '2024-11-18': {color: '#70d7c7', inactive: true, marked: true},
+        '2024-11-19': {
+          endingDay: true,
+          color: '#50cebb',
+          textColor: 'white'
+        },
+        '2024-12-01': {inactive: true, disableTouchEvent: true}
+      }}
+      theme={{
+        textInactiveColor: '#a68a9f',
+        inactiveDotColor: '#a68a9f',
+        textSectionTitleDisabledColor: 'grey',
+        textSectionTitleColor: '#319e8e',
+        arrowColor: '#319e8e'
+      }}
+      onDayPress={(day) => console.log('Day pressed:', day.dateString)}
+    />
+  );
+};
+
+export default App;
+```
+
+## Custom day component
+
+Replace the default day rendering with a custom component:
+
+```javascript
+import React from 'react';
+import {View, Text, StyleSheet} from 'react-native';
+import {Calendar} from 'react-native-calendars';
+
+const App = () => {
+  return (
+    <Calendar
+      style={styles.calendar}
+      dayComponent={({date, state}) => {
+        return (
+          <View>
+            <Text
+              style={[
+                styles.customDay,
+                state === 'disabled' ? styles.disabledText : styles.defaultText
+              ]}
+            >
+              {date?.day}
+            </Text>
+          </View>
+        );
+      }}
+    />
+  );
+};
+
+const styles = StyleSheet.create({
+  calendar: {
+    height: 250,
+    borderBottomWidth: 1,
+    borderBottomColor: 'lightgrey'
+  },
+  customDay: {
+    textAlign: 'center'
+  },
+  disabledText: {
+    color: 'grey'
+  },
+  defaultText: {
+    color: 'purple'
+  }
+});
+
+export default App;
+```
+
+<Note>
+The `dayComponent` prop gives you complete control over how each day is rendered.
+</Note>
+
+## Locale configuration
+
+Customize the calendar for different languages:
+
+```javascript
+import React, {useState} from 'react';
+import {Calendar, LocaleConfig} from 'react-native-calendars';
+
+LocaleConfig.locales['fr'] = {
+  monthNames: [
+    'Janvier',
+    'Février',
+    'Mars',
+    'Avril',
+    'Mai',
+    'Juin',
+    'Juillet',
+    'Août',
+    'Septembre',
+    'Octobre',
+    'Novembre',
+    'Décembre'
+  ],
+  monthNamesShort: ['Janv.', 'Févr.', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'],
+  dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+  dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
+  today: "Aujourd'hui"
+};
+
+LocaleConfig.defaultLocale = 'fr';
+
+const App = () => {
+  const [selected, setSelected] = useState('');
+
+  return (
+    <Calendar
+      onDayPress={day => {
+        setSelected(day.dateString);
+      }}
+      markedDates={{
+        [selected]: {selected: true, disableTouchEvent: true, selectedDotColor: 'orange'}
+      }}
+    />
+  );
+};
+
+export default App;
+```
+
+## Theme properties reference
+
+<CodeGroup>
+
+```javascript Colors
+theme={{
+  // Background colors
+  backgroundColor: '#ffffff',
+  calendarBackground: '#ffffff',
+  
+  // Text colors
+  textSectionTitleColor: '#b6c1cd',
+  textSectionTitleDisabledColor: '#d9e1e8',
+  selectedDayTextColor: '#ffffff',
+  todayTextColor: '#00adf5',
+  dayTextColor: '#2d4150',
+  textDisabledColor: '#d9e1e8',
+  monthTextColor: 'blue',
+  
+  // Selection colors
+  selectedDayBackgroundColor: '#00adf5',
+  
+  // Dot colors
+  dotColor: '#00adf5',
+  selectedDotColor: '#ffffff',
+  
+  // Arrow colors
+  arrowColor: 'orange',
+  
+  // Inactive colors
+  textInactiveColor: '#a68a9f',
+  inactiveDotColor: '#a68a9f',
+  
+  // Loading indicator
+  indicatorColor: 'blue'
+}}
+```
+
+```javascript Typography
+theme={{
+  // Font settings
+  textDayFontFamily: 'System',
+  textMonthFontFamily: 'System',
+  textDayHeaderFontFamily: 'System',
+  
+  // Font weights
+  textDayFontWeight: '300',
+  textMonthFontWeight: 'bold',
+  textDayHeaderFontWeight: '300',
+  
+  // Font sizes
+  textDayFontSize: 16,
+  textMonthFontSize: 16,
+  textDayHeaderFontSize: 13
+}}
+```
+
+```javascript Advanced
+theme={{
+  // Stylesheet overrides
+  stylesheet: {
+    calendar: {
+      header: {
+        week: {
+          marginTop: 30,
+          flexDirection: 'row',
+          justifyContent: 'space-between'
+        }
+      }
+    },
+    day: {
+      basic: {
+        // Override day styles
+      },
+      period: {
+        // Override period marking styles
+      }
+    }
+  }
+}}
+```
+
+</CodeGroup>
+
+## Complete theme example
+
+Here's a comprehensive theme configuration:
+
+```javascript
+const customTheme = {
+  // Backgrounds
+  backgroundColor: '#f8f9fa',
+  calendarBackground: '#ffffff',
+  
+  // Text colors
+  textSectionTitleColor: '#495057',
+  selectedDayTextColor: '#ffffff',
+  todayTextColor: '#0066cc',
+  dayTextColor: '#212529',
+  textDisabledColor: '#ced4da',
+  monthTextColor: '#212529',
+  
+  // Selection
+  selectedDayBackgroundColor: '#0066cc',
+  
+  // Dots
+  dotColor: '#0066cc',
+  selectedDotColor: '#ffffff',
+  
+  // Arrows
+  arrowColor: '#0066cc',
+  
+  // Typography
+  textDayFontFamily: 'System',
+  textMonthFontFamily: 'System',
+  textDayHeaderFontFamily: 'System',
+  textDayFontWeight: '400',
+  textMonthFontWeight: '600',
+  textDayHeaderFontWeight: '400',
+  textDayFontSize: 16,
+  textMonthFontSize: 18,
+  textDayHeaderFontSize: 14
+};
+
+<Calendar theme={customTheme} />
+```
