@@ -1,0 +1,331 @@
+---
+title: AgendaList
+description: A scrollable list component that displays agenda items organized by date sections
+---
+
+## Overview
+
+The `AgendaList` component is a specialized scrollable list that organizes agenda items by date sections. It extends React Native's `SectionList` and must be wrapped with `CalendarProvider` to work properly. The component automatically handles date synchronization with the calendar and provides smooth scrolling between date sections.
+
+<Note>
+The `AgendaList` component must be wrapped with `CalendarProvider` to function correctly.
+</Note>
+
+## Basic usage
+
+```jsx
+import { CalendarProvider, AgendaList } from 'react-native-calendars';
+
+const App = () => {
+  const agendaItems = [
+    {
+      title: '2024-03-01',
+      data: [{name: 'Meeting', hour: '9am'}]
+    },
+    {
+      title: '2024-03-02',
+      data: [{name: 'Lunch', hour: '12pm'}]
+    }
+  ];
+
+  return (
+    <CalendarProvider date="2024-03-01">
+      <AgendaList
+        sections={agendaItems}
+        renderItem={({item}) => (
+          <View>
+            <Text>{item.name}</Text>
+            <Text>{item.hour}</Text>
+          </View>
+        )}
+      />
+    </CalendarProvider>
+  );
+};
+```
+
+## Complete example
+
+<CodeGroup>
+```jsx Basic example
+import React, { useCallback } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { CalendarProvider, ExpandableCalendar, AgendaList } from 'react-native-calendars';
+
+const ITEMS = [
+  {
+    title: '2024-03-01',
+    data: [{name: 'Meeting', hour: '9am'}]
+  },
+  {
+    title: '2024-03-02',
+    data: [{name: 'Lunch', hour: '12pm'}]
+  }
+];
+
+const ExpandableCalendarScreen = () => {
+  const renderItem = useCallback(({item}) => {
+    return (
+      <View style={styles.item}>
+        <Text>{item.name}</Text>
+        <Text>{item.hour}</Text>
+      </View>
+    );
+  }, []);
+
+  return (
+    <CalendarProvider date={ITEMS[0]?.title} showTodayButton>
+      <ExpandableCalendar firstDay={1} />
+      <AgendaList
+        sections={ITEMS}
+        renderItem={renderItem}
+        sectionStyle={styles.section}
+      />
+    </CalendarProvider>
+  );
+};
+
+const styles = StyleSheet.create({
+  section: {
+    backgroundColor: '#f0f0f0',
+    color: 'grey',
+    textTransform: 'capitalize'
+  },
+  item: {
+    padding: 20,
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0'
+  }
+});
+
+export default ExpandableCalendarScreen;
+```
+
+```jsx With custom date formatting
+import React from 'react';
+import { CalendarProvider, AgendaList } from 'react-native-calendars';
+
+const App = () => {
+  const dayFormatter = (date) => {
+    const dateObj = new Date(date);
+    return dateObj.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  };
+
+  return (
+    <CalendarProvider>
+      <AgendaList
+        sections={items}
+        renderItem={renderItem}
+        dayFormatter={dayFormatter}
+        markToday={true}
+      />
+    </CalendarProvider>
+  );
+};
+```
+
+```jsx With scroll to next event
+import React from 'react';
+import { CalendarProvider, AgendaList } from 'react-native-calendars';
+
+const App = () => {
+  return (
+    <CalendarProvider>
+      <AgendaList
+        sections={items}
+        renderItem={renderItem}
+        scrollToNextEvent={true}
+        viewOffset={50}
+      />
+    </CalendarProvider>
+  );
+};
+```
+</CodeGroup>
+
+## Props
+
+The `AgendaList` component extends all props from React Native's `SectionList` component and adds the following custom props:
+
+<ParamField path="theme" type="Theme">
+  Specify theme properties to override specific styles for calendar parts.
+</ParamField>
+
+<ParamField path="sections" type="SectionListData[]" required>
+  The sections to render in the list. Each section should have a `title` (date string in format 'YYYY-MM-DD') and `data` (array of items).
+  
+  ```jsx
+  sections={[
+    { title: '2024-03-01', data: [{...}] },
+    { title: '2024-03-02', data: [{...}] }
+  ]}
+  ```
+</ParamField>
+
+<ParamField path="renderItem" type="function" required>
+  Function to render each item in the list.
+  
+  ```jsx
+  renderItem={({item}) => <View><Text>{item.title}</Text></View>}
+  ```
+</ParamField>
+
+<ParamField path="dayFormat" type="string" default="dddd, MMM d">
+  Day format in section title. Uses XDate formatting values by default, or moment.js format if `useMoment` is true.
+  
+  Formatting reference: http://arshaw.com/xdate/#Formatting
+  
+  ```jsx
+  dayFormat="yyyy-MM-dd"
+  ```
+</ParamField>
+
+<ParamField path="dayFormatter" type="(date: string) => string">
+  A custom function to format the section header's title. This overrides `dayFormat` if provided.
+  
+  ```jsx
+  dayFormatter={(date) => new Date(date).toLocaleDateString()}
+  ```
+</ParamField>
+
+<ParamField path="useMoment" type="boolean" default={false}>
+  Whether to use moment.js for date string formatting. When enabled, remember to pass `dayFormat` with appropriate moment.js format (e.g., 'dddd, MMM D').
+  
+  ```jsx
+  useMoment={true}
+  dayFormat="dddd, MMM D"
+  ```
+</ParamField>
+
+<ParamField path="markToday" type="boolean" default={true}>
+  Whether to mark today's title with the "Today, ..." string prefix.
+  
+  ```jsx
+  markToday={false}
+  ```
+</ParamField>
+
+<ParamField path="sectionStyle" type="ViewStyle">
+  Style object passed to the section header view.
+  
+  ```jsx
+  sectionStyle={{
+    backgroundColor: '#f0f0f0',
+    color: 'grey',
+    textTransform: 'capitalize'
+  }}
+  ```
+</ParamField>
+
+<ParamField path="renderSectionHeader" type="(title: string) => JSX.Element">
+  Custom function to render section headers. Receives the section title (date string) as parameter.
+  
+  ```jsx
+  renderSectionHeader={(title) => (
+    <View style={styles.header}>
+      <Text>{title}</Text>
+    </View>
+  )}
+  ```
+</ParamField>
+
+<ParamField path="avoidDateUpdates" type="boolean" default={false}>
+  Whether to block the date change in calendar (and calendar context provider) when the agenda scrolls.
+  
+  ```jsx
+  avoidDateUpdates={true}
+  ```
+</ParamField>
+
+<ParamField path="viewOffset" type="number" default={0}>
+  Offset value for scrolling to section. Useful when you have sticky headers or other UI elements that might overlap the scrolled-to section.
+  
+  ```jsx
+  viewOffset={50}
+  ```
+</ParamField>
+
+<ParamField path="scrollToNextEvent" type="boolean" default={false}>
+  Enable scrolling the agenda list to the next date with content when pressing a day without content.
+  
+  ```jsx
+  scrollToNextEvent={true}
+  ```
+</ParamField>
+
+<ParamField path="keyExtractor" type="(item: any, index: number) => string">
+  Function to extract unique keys for list items. If not provided, uses the index as the key.
+  
+  ```jsx
+  keyExtractor={(item, index) => item.id || String(index)}
+  ```
+</ParamField>
+
+<ParamField path="onViewableItemsChanged" type="(info: ViewableItemsChangedInfo) => void">
+  Callback called when the viewable items change. Receives info about viewable and changed items.
+  
+  ```jsx
+  onViewableItemsChanged={(info) => {
+    console.log('Viewable items:', info.viewableItems);
+  }}
+  ```
+</ParamField>
+
+<ParamField path="infiniteListProps" type="object">
+  <Warning>
+  This is an experimental feature and subject to change.
+  </Warning>
+  
+  If defined, uses InfiniteList instead of SectionList for better performance with large datasets.
+  
+  Properties:
+  - `itemHeight` (number): Height of each item
+  - `titleHeight` (number): Height of section headers
+  - `itemHeightByType` (Record&lt;string, number&gt;): Custom heights by item type
+  - `visibleIndicesChangedDebounce` (number): Debounce time for visible indices change
+  - `renderFooter` (() => React.ReactElement | null): Function to render footer
+  
+  ```jsx
+  infiniteListProps={{
+    itemHeight: 80,
+    titleHeight: 60,
+    visibleIndicesChangedDebounce: 500
+  }}
+  ```
+</ParamField>
+
+## Inherited props
+
+Since `AgendaList` extends React Native's `SectionList`, it also inherits all `SectionList` props including:
+
+- `onScroll`
+- `onMomentumScrollBegin`
+- `onMomentumScrollEnd`
+- `onScrollToIndexFailed`
+- `stickySectionHeadersEnabled` (default: true)
+- And all other [SectionList props](https://reactnative.dev/docs/sectionlist)
+
+## Notes
+
+<Note>
+  Section titles should match the current date format used in your calendar. The default format is 'YYYY-MM-DD'.
+</Note>
+
+<Note>
+  The component automatically handles scrolling to the selected date when it changes in the calendar context.
+</Note>
+
+<Warning>
+  When using `infiniteListProps`, the behavior changes to use a RecyclerListView-based implementation for better performance, but some SectionList features may work differently.
+</Warning>
+
+## Related components
+
+- [CalendarProvider](/api/calendar-provider) - Required wrapper for AgendaList
+- [ExpandableCalendar](/api/expandable-calendar) - Often used together with AgendaList
+- [WeekCalendar](/api/week-calendar) - Alternative calendar component

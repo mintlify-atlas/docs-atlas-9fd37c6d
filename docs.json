@@ -60,9 +60,11 @@
               "api/calendar",
               "api/calendar-list",
               "api/agenda",
+              "api/agenda-list",
               "api/expandable-calendar",
               "api/week-calendar",
-              "api/timeline"
+              "api/timeline",
+              "api/timeline-list"
             ]
           },
           {

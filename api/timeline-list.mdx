@@ -1,0 +1,356 @@
+---
+title: TimelineList
+description: A horizontal paging list component that displays timeline views for multiple days
+---
+
+## Overview
+
+The `TimelineList` component is a horizontally scrollable paging list that displays timeline views for multiple days. It must be wrapped with `CalendarProvider` and automatically synchronizes with the selected date in the calendar context. This component is ideal for creating week or multi-day timeline views.
+
+<Note>
+The `TimelineList` component must be wrapped with `CalendarProvider` to function correctly.
+</Note>
+
+## Basic usage
+
+```jsx
+import { CalendarProvider, TimelineList } from 'react-native-calendars';
+
+const App = () => {
+  const events = {
+    '2024-03-01': [
+      {
+        id: '1',
+        start: '2024-03-01 09:00:00',
+        end: '2024-03-01 10:00:00',
+        title: 'Meeting',
+        color: 'lightblue'
+      }
+    ],
+    '2024-03-02': [
+      {
+        id: '2',
+        start: '2024-03-02 14:00:00',
+        end: '2024-03-02 15:00:00',
+        title: 'Lunch',
+        color: 'lightgreen'
+      }
+    ]
+  };
+
+  return (
+    <CalendarProvider date="2024-03-01">
+      <TimelineList
+        events={events}
+        timelineProps={{
+          format24h: true
+        }}
+        showNowIndicator
+      />
+    </CalendarProvider>
+  );
+};
+```
+
+## Complete example
+
+<CodeGroup>
+```jsx Basic timeline calendar
+import React, { Component } from 'react';
+import { 
+  ExpandableCalendar, 
+  TimelineList, 
+  CalendarProvider 
+} from 'react-native-calendars';
+import { groupBy } from 'lodash';
+
+const INITIAL_TIME = { hour: 9, minutes: 0 };
+
+class TimelineCalendarScreen extends Component {
+  state = {
+    currentDate: '2024-03-01',
+    events: [
+      {
+        id: '1',
+        start: '2024-03-01 09:00:00',
+        end: '2024-03-01 10:00:00',
+        title: 'Meeting',
+        color: 'lightblue'
+      }
+    ],
+    eventsByDate: {}
+  };
+
+  componentDidMount() {
+    const eventsByDate = groupBy(
+      this.state.events, 
+      e => e.start.split(' ')[0]
+    );
+    this.setState({ eventsByDate });
+  }
+
+  onDateChanged = (date) => {
+    this.setState({ currentDate: date });
+  };
+
+  timelineProps = {
+    format24h: true,
+    unavailableHours: [
+      { start: 0, end: 6 }, 
+      { start: 22, end: 24 }
+    ],
+    overlapEventsSpacing: 8,
+    rightEdgeSpacing: 24
+  };
+
+  render() {
+    const { currentDate, eventsByDate } = this.state;
+
+    return (
+      <CalendarProvider
+        date={currentDate}
+        onDateChanged={this.onDateChanged}
+        showTodayButton
+      >
+        <ExpandableCalendar firstDay={1} />
+        <TimelineList
+          events={eventsByDate}
+          timelineProps={this.timelineProps}
+          showNowIndicator
+          scrollToFirst
+          initialTime={INITIAL_TIME}
+        />
+      </CalendarProvider>
+    );
+  }
+}
+
+export default TimelineCalendarScreen;
+```
+
+```jsx With custom rendering
+import React from 'react';
+import { View, Text } from 'react-native';
+import { CalendarProvider, TimelineList, Timeline } from 'react-native-calendars';
+
+const App = () => {
+  const renderItem = (timelineProps, info) => {
+    return (
+      <View>
+        <Text>{info.item}</Text>
+        {info.isToday && <Text>Today</Text>}
+        <Timeline {...timelineProps} />
+      </View>
+    );
+  };
+
+  return (
+    <CalendarProvider>
+      <TimelineList
+        events={eventsByDate}
+        renderItem={renderItem}
+        showNowIndicator
+      />
+    </CalendarProvider>
+  );
+};
+```
+
+```jsx Multi-day view
+import React from 'react';
+import { CalendarProvider, TimelineList } from 'react-native-calendars';
+
+const App = () => {
+  return (
+    <CalendarProvider numberOfDays={3}>
+      <TimelineList
+        events={eventsByDate}
+        timelineProps={{
+          format24h: true,
+          start: 8,
+          end: 20
+        }}
+        showNowIndicator
+        scrollToNow
+      />
+    </CalendarProvider>
+  );
+};
+```
+</CodeGroup>
+
+## Props
+
+<ParamField path="events" type="{[date: string]: TimelineEvent[]}" required>
+  Map of all timeline events organized by date. Each key should be a date string (YYYY-MM-DD format) and the value should be an array of timeline events.
+  
+  Each event should have:
+  - `start` (string): Start time in 'YYYY-MM-DD HH:mm:ss' format
+  - `end` (string): End time in 'YYYY-MM-DD HH:mm:ss' format
+  - `title` (string): Event title
+  - `color` (string): Event color
+  
+  ```jsx
+  events={{
+    '2024-03-01': [
+      {
+        id: '1',
+        start: '2024-03-01 09:00:00',
+        end: '2024-03-01 10:00:00',
+        title: 'Meeting',
+        color: 'lightblue'
+      }
+    ],
+    '2024-03-02': [
+      {
+        id: '2',
+        start: '2024-03-02 14:00:00',
+        end: '2024-03-02 15:00:00',
+        title: 'Lunch',
+        color: 'lightgreen'
+      }
+    ]
+  }}
+  ```
+</ParamField>
+
+<ParamField path="timelineProps" type="Omit<TimelineProps, 'events' | 'scrollToFirst' | 'showNowIndicator' | 'scrollToNow' | 'initialTime'>">
+  General timeline props to pass to each timeline item. These props are applied to all timeline pages.
+  
+  Common properties:
+  - `format24h` (boolean): Use 24-hour format
+  - `start` (number): Start hour (0-23)
+  - `end` (number): End hour (0-23)
+  - `unavailableHours` (Array): Hours to mark as unavailable
+  - `overlapEventsSpacing` (number): Spacing between overlapping events
+  - `rightEdgeSpacing` (number): Right edge spacing
+  
+  ```jsx
+  timelineProps={{
+    format24h: true,
+    start: 8,
+    end: 20,
+    unavailableHours: [{start: 0, end: 6}, {start: 22, end: 24}],
+    overlapEventsSpacing: 8,
+    rightEdgeSpacing: 24
+  }}
+  ```
+  
+  See [Timeline](/api/timeline) component for all available props.
+</ParamField>
+
+<ParamField path="renderItem" type="(timelineProps: TimelineProps, info: TimelineListRenderItemInfo) => JSX.Element">
+  Pass to render a custom Timeline item. This allows you to wrap or customize each timeline page.
+  
+  The `info` object contains:
+  - `item` (string): The date string for this page
+  - `index` (number): The page index
+  - `isCurrent` (boolean): Whether this is the currently selected date
+  - `isInitialPage` (boolean): Whether this is the initial page
+  - `isToday` (boolean): Whether this date is today
+  
+  ```jsx
+  renderItem={(timelineProps, info) => (
+    <View>
+      {info.isToday && <Text>Today</Text>}
+      <Timeline {...timelineProps} />
+    </View>
+  )}
+  ```
+</ParamField>
+
+<ParamField path="scrollToFirst" type="boolean" default={false}>
+  Should scroll to the first event of the day when the page loads.
+  
+  <Note>
+  This prop is only applied to the initial page and only for dates that are NOT today.
+  </Note>
+  
+  ```jsx
+  scrollToFirst={true}
+  ```
+</ParamField>
+
+<ParamField path="showNowIndicator" type="boolean" default={false}>
+  Should show the now indicator line. The indicator is shown only on today's timeline.
+  
+  ```jsx
+  showNowIndicator={true}
+  ```
+</ParamField>
+
+<ParamField path="scrollToNow" type="boolean" default={false}>
+  Should initially scroll to the current time. This is only relevant for today's timeline on the initial page.
+  
+  <Note>
+  This prop only applies to the current day's timeline when it's the initial page.
+  </Note>
+  
+  ```jsx
+  scrollToNow={true}
+  ```
+</ParamField>
+
+<ParamField path="initialTime" type="{hour: number, minutes: number}">
+  Should initially scroll to a specific time. This is only relevant for timelines that are NOT today and only on the initial page.
+  
+  ```jsx
+  initialTime={{hour: 9, minutes: 0}}
+  ```
+</ParamField>
+
+## How it works
+
+1. **Horizontal Paging**: The component creates a horizontal scrollable list of timeline pages. Each page represents one or more days (controlled by `numberOfDays` in CalendarProvider).
+
+2. **Date Synchronization**: When you scroll between pages, the component automatically updates the selected date in the CalendarProvider context.
+
+3. **Infinite Scrolling**: The component uses an InfiniteList internally to provide smooth scrolling and automatic page management. When you reach near the edge of the available pages, new pages are generated automatically.
+
+4. **Multi-day Support**: When `numberOfDays` is set in CalendarProvider (e.g., `numberOfDays={3}`), each page displays multiple days side-by-side.
+
+## Usage with CalendarProvider
+
+The `TimelineList` component works closely with `CalendarProvider` and respects the following context properties:
+
+```jsx
+<CalendarProvider
+  date="2024-03-01"              // Initial date
+  numberOfDays={1}                // Number of days per page (1-7)
+  onDateChanged={(date) => {}}    // Called when date changes
+  timelineLeftInset={0}           // Left inset for timeline
+>
+  <TimelineList {...props} />
+</CalendarProvider>
+```
+
+## Performance considerations
+
+<Note>
+  The TimelineList component uses InfiniteList internally for optimal performance with large datasets and infinite scrolling.
+</Note>
+
+- Pages are rendered on demand as you scroll
+- Automatic page recycling when scrolling far from the initial position
+- Smooth synchronization with calendar date changes
+- Optimized for both iOS and Android, including RTL support
+
+## Notes
+
+<Note>
+  Event times must be in the format 'YYYY-MM-DD HH:mm:ss' for proper rendering.
+</Note>
+
+<Note>
+  The component automatically handles RTL (right-to-left) layouts on Android and React Native 0.73+.
+</Note>
+
+<Warning>
+  The `scrollToFirst`, `showNowIndicator`, `scrollToNow`, and `initialTime` props are handled internally and should not be passed in `timelineProps`.
+</Warning>
+
+## Related components
+
+- [CalendarProvider](/api/calendar-provider) - Required wrapper for TimelineList
+- [Timeline](/api/timeline) - The individual timeline component rendered for each day
+- [ExpandableCalendar](/api/expandable-calendar) - Often used together with TimelineList
